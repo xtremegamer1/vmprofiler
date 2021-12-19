@@ -1,0 +1,27 @@
+[project]
+name = "vmprofiler"
+
+[subdir.dependencies]
+
+[target.vmprofiler]
+type = "static"
+compile-features = ["cxx_std_20"]
+
+sources = [
+    "dependencies/vmprofiler/src/vmprofiles/**.cpp",
+    "dependencies/vmprofiler/include/transform.hpp",
+    "dependencies/vmprofiler/include/vmprofiles.hpp"
+]
+
+include-directories = [
+    "include",
+]
+
+link-libraries = [
+    "Zydis",
+    "linux-pe",
+]
+
+compile-definitions = [
+    "NOMINMAX"
+]

@@ -1,0 +1,3 @@
+[submodule "dependencies/vmprofiler"]
+	path = dependencies/vmprofiler
+	url = https://githacks.org/vmp2/vmprofiler

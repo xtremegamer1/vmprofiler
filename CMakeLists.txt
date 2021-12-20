@@ -78,7 +78,9 @@ list(APPEND vmprofiler_SOURCES
 	"dependencies/vmprofiler/include/vmprofiles.hpp"
 	"dependencies/vmprofiler/include/vmutils.hpp"
 	"dependencies/vmprofiler/include/scn.hpp"
+	"src/vmctx.cpp"
 	"src/vmlocate.cpp"
+	"include/vmctx.hpp"
 	"include/vmlocate.hpp"
 	"include/vmprofiler.hpp"
 )

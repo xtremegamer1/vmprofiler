@@ -1,20 +1,17 @@
 [project]
 name = "vmprofiler"
 
-[subdir.dependencies]
-
 [target.vmprofiler]
 type = "static"
 compile-features = ["cxx_std_20"]
 
 sources = [
     "dependencies/vmprofiler/src/vmprofiles/**.cpp",
-    "dependencies/vmprofiler/include/transform.hpp",
-    "dependencies/vmprofiler/include/vmprofiles.hpp"
+    "include/**.hpp"
 ]
 
 include-directories = [
-    "include",
+    "include"
 ]
 
 link-libraries = [
@@ -25,3 +22,16 @@ link-libraries = [
 compile-definitions = [
     "NOMINMAX"
 ]
+
+[options]
+ZYDIS_BUILD_SHARED_LIB = false
+ZYDIS_BUILD_EXAMPLES = false
+ZYDIS_BUILD_TOOLS = false
+ZYDIS_FUZZ_AFL_FAST = false
+ZYDIS_LIBFUZZER = false
+
+[subdir."dependencies/vmprofiler/dependencies/zydis/"]
+
+[target.linux-pe]
+type = "interface"
+include-directories = ["dependencies/vmprofiler/dependencies/linux-pe/includes/"]

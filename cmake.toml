@@ -7,9 +7,13 @@ compile-features = ["cxx_std_20"]
 
 sources = [
     "dependencies/vmprofiler/src/vmprofiles/**.cpp",
+    "dependencies/vmprofiler/src/vmutils.cpp",
+    "dependencies/vmprofiler/src/scn.cpp",
     "dependencies/vmprofiler/include/transform.hpp",
     "dependencies/vmprofiler/include/vmprofiles.hpp",
     "dependencies/vmprofiler/include/vmutils.hpp",
+    "dependencies/vmprofiler/include/scn.hpp",
+    "src/**.cpp",
     "include/**.hpp"
 ]
 

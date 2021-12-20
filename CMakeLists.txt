@@ -72,9 +72,14 @@ list(APPEND vmprofiler_SOURCES
 	"dependencies/vmprofiler/src/vmprofiles/vmexit.cpp"
 	"dependencies/vmprofiler/src/vmprofiles/write.cpp"
 	"dependencies/vmprofiler/src/vmprofiles/writecr3.cpp"
+	"dependencies/vmprofiler/src/vmutils.cpp"
+	"dependencies/vmprofiler/src/scn.cpp"
 	"dependencies/vmprofiler/include/transform.hpp"
 	"dependencies/vmprofiler/include/vmprofiles.hpp"
 	"dependencies/vmprofiler/include/vmutils.hpp"
+	"dependencies/vmprofiler/include/scn.hpp"
+	"src/vmlocate.cpp"
+	"include/vmlocate.hpp"
 	"include/vmprofiler.hpp"
 )
 

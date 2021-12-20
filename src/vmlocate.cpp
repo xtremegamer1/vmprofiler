@@ -69,9 +69,9 @@ namespace vm::locate
             } );
 
             /*
-            only two legit imm pushes for every vm entry...
+            only one legit imm pushes for every vm entry...
             > 0x822c :                                    push 0xFFFFFFFF890001FA <---
-            > 0x7fc9 :                                    push 0x45D3BF1F         <---
+            > 0x7fc9 :                                    call xxxxx
             > 0x48e4 :                                    push r13
             > 0x4690 :                                    push rsi
             > 0x4e53 :                                    push r14

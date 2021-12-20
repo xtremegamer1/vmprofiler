@@ -7,11 +7,15 @@ compile-features = ["cxx_std_20"]
 
 sources = [
     "dependencies/vmprofiler/src/vmprofiles/**.cpp",
+    "dependencies/vmprofiler/include/transform.hpp",
+    "dependencies/vmprofiler/include/vmprofiles.hpp",
+    "dependencies/vmprofiler/include/vmutils.hpp",
     "include/**.hpp"
 ]
 
 include-directories = [
-    "include"
+    "include",
+    "dependencies/vmprofiler/include/"
 ]
 
 link-libraries = [

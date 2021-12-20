@@ -72,6 +72,9 @@ list(APPEND vmprofiler_SOURCES
 	"dependencies/vmprofiler/src/vmprofiles/vmexit.cpp"
 	"dependencies/vmprofiler/src/vmprofiles/write.cpp"
 	"dependencies/vmprofiler/src/vmprofiles/writecr3.cpp"
+	"dependencies/vmprofiler/include/transform.hpp"
+	"dependencies/vmprofiler/include/vmprofiles.hpp"
+	"dependencies/vmprofiler/include/vmutils.hpp"
 	"include/vmprofiler.hpp"
 )
 
@@ -98,6 +101,7 @@ target_compile_features(vmprofiler PUBLIC
 
 target_include_directories(vmprofiler PUBLIC
 	include
+	"dependencies/vmprofiler/include/"
 )
 
 target_link_libraries(vmprofiler PUBLIC

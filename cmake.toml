@@ -6,20 +6,12 @@ type = "static"
 compile-features = ["cxx_std_20"]
 
 sources = [
-    "dependencies/vmprofiler/src/vmprofiles/**.cpp",
-    "dependencies/vmprofiler/src/vmutils.cpp",
-    "dependencies/vmprofiler/src/scn.cpp",
-    "dependencies/vmprofiler/include/transform.hpp",
-    "dependencies/vmprofiler/include/vmprofiles.hpp",
-    "dependencies/vmprofiler/include/vmutils.hpp",
-    "dependencies/vmprofiler/include/scn.hpp",
     "src/**.cpp",
     "include/**.hpp"
 ]
 
 include-directories = [
     "include",
-    "dependencies/vmprofiler/include/"
 ]
 
 link-libraries = [
@@ -38,8 +30,7 @@ ZYDIS_BUILD_TOOLS = false
 ZYDIS_FUZZ_AFL_FAST = false
 ZYDIS_LIBFUZZER = false
 
-[subdir."dependencies/vmprofiler/dependencies/zydis/"]
-
+[subdir.zydis]
 [target.linux-pe]
 type = "interface"
-include-directories = ["dependencies/vmprofiler/dependencies/linux-pe/includes/"]
+include-directories = ["linux-pe/includes/"]

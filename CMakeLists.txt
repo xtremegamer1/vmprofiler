@@ -32,14 +32,14 @@ option(ZYDIS_BUILD_TOOLS OFF)
 option(ZYDIS_FUZZ_AFL_FAST OFF)
 option(ZYDIS_LIBFUZZER OFF)
 
-# dependencies/vmprofiler/dependencies/zydis/
+# zydis
 set(CMKR_CMAKE_FOLDER ${CMAKE_FOLDER})
 if(CMAKE_FOLDER)
-	set(CMAKE_FOLDER "${CMAKE_FOLDER}/dependencies/vmprofiler/dependencies/zydis/")
+	set(CMAKE_FOLDER "${CMAKE_FOLDER}/zydis")
 else()
-	set(CMAKE_FOLDER "dependencies/vmprofiler/dependencies/zydis/")
+	set(CMAKE_FOLDER zydis)
 endif()
-add_subdirectory("dependencies/vmprofiler/dependencies/zydis/")
+add_subdirectory(zydis)
 set(CMAKE_FOLDER ${CMKR_CMAKE_FOLDER})
 
 # Target vmprofiler
@@ -47,37 +47,6 @@ set(CMKR_TARGET vmprofiler)
 set(vmprofiler_SOURCES "")
 
 list(APPEND vmprofiler_SOURCES
-	"dependencies/vmprofiler/src/vmprofiles/add.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/call.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/div.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/idiv.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/imul.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/jmp.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/lconst.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/lflags.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/lreg.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/mul.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/nand.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/popvsp.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/pushvsp.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/rdtsc.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/read.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/readcr3.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/readcr8.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/shl.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/shld.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/shr.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/shrd.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/sreg.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/vmexit.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/write.cpp"
-	"dependencies/vmprofiler/src/vmprofiles/writecr3.cpp"
-	"dependencies/vmprofiler/src/vmutils.cpp"
-	"dependencies/vmprofiler/src/scn.cpp"
-	"dependencies/vmprofiler/include/transform.hpp"
-	"dependencies/vmprofiler/include/vmprofiles.hpp"
-	"dependencies/vmprofiler/include/vmutils.hpp"
-	"dependencies/vmprofiler/include/scn.hpp"
 	"src/vmlocate.cpp"
 	"include/vmctx.hpp"
 	"include/vmlocate.hpp"
@@ -107,7 +76,6 @@ target_compile_features(vmprofiler PUBLIC
 
 target_include_directories(vmprofiler PUBLIC
 	include
-	"dependencies/vmprofiler/include/"
 )
 
 target_link_libraries(vmprofiler PUBLIC
@@ -130,7 +98,7 @@ if(linux-pe_SOURCES)
 endif()
 
 target_include_directories(linux-pe INTERFACE
-	"dependencies/vmprofiler/dependencies/linux-pe/includes/"
+	"linux-pe/includes/"
 )
 
 unset(CMKR_TARGET)

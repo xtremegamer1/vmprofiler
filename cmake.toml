@@ -22,3 +22,5 @@ link-libraries = [
 compile-definitions = [
     "NOMINMAX"
 ]
+
+[subdir.deps]

@@ -53,7 +53,7 @@ std::vector<vm_enter_t> get_vm_entries(std::uintptr_t module_base,
     if (!scn::executable(module_base, result))
       continue;
 
-    if (!vm::util::flatten(rtn, result, false, 500, module_base))
+    if (!vm::utils::flatten(rtn, result, false, 500, module_base))
       continue;
 
     // the last instruction in the stream should be a JMP to a register or a

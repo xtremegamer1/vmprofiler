@@ -25,6 +25,16 @@ endif()
 
 project(vmprofiler)
 
+# deps
+set(CMKR_CMAKE_FOLDER ${CMAKE_FOLDER})
+if(CMAKE_FOLDER)
+	set(CMAKE_FOLDER "${CMAKE_FOLDER}/deps")
+else()
+	set(CMAKE_FOLDER deps)
+endif()
+add_subdirectory(deps)
+set(CMAKE_FOLDER ${CMKR_CMAKE_FOLDER})
+
 # Target vmprofiler
 set(CMKR_TARGET vmprofiler)
 set(vmprofiler_SOURCES "")

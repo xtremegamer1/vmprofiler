@@ -108,12 +108,14 @@ int __cdecl main(int argc, const char* argv[]) {
     return -1;
   }
 
-  vm::utils::print(vmctx.m_vm_entry);
+  auto vm_enter = vmctx.get_vm_enter();
+  vm::utils::print(vm_enter);
+
   std::printf("> Starting Virtual Instruction Pointer Register: %s\n",
-              ZydisRegisterGetString(vmctx.m_vip));
+              ZydisRegisterGetString(vmctx.get_vip()));
 
   std::printf("> Starting Virtual Stack Pointer Register: %s\n",
-              ZydisRegisterGetString(vmctx.m_vsp));
+              ZydisRegisterGetString(vmctx.get_vsp()));
 
   // testing vmlocate port for vmp3...
   const auto vm_entries = vm::locate::get_vm_entries(module_base, image_size);

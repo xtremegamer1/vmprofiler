@@ -12,9 +12,15 @@ class vmctx_t {
   const std::uintptr_t m_module_base, m_image_base, m_vm_entry_rva,
       m_image_size;
 
+  zydis_register_t get_vip() const { return m_vip; }
+  zydis_register_t get_vsp() const { return m_vsp; }
+  zydis_routine_t get_vm_enter() const { return m_vm_entry; }
+
+ private:
   /// <summary>
-  /// m_vip and m_vsp are volitile and are subject to change... they are set to
-  /// the ones used in vm enter but can be changed by external source code...
+  /// m_vip and m_vsp are set to the native registers used for them by the vm
+  /// enter... these will change during the execution inside of the vm but these
+  /// values stay the same as the ones used by vm enter...
   /// </summary>
   zydis_register_t m_vip, m_vsp;
 

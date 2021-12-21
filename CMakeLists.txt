@@ -25,32 +25,18 @@ endif()
 
 project(vmprofiler)
 
-# Options
-option(ZYDIS_BUILD_SHARED_LIB OFF)
-option(ZYDIS_BUILD_EXAMPLES OFF)
-option(ZYDIS_BUILD_TOOLS OFF)
-option(ZYDIS_FUZZ_AFL_FAST OFF)
-option(ZYDIS_LIBFUZZER OFF)
-
-# zydis
-set(CMKR_CMAKE_FOLDER ${CMAKE_FOLDER})
-if(CMAKE_FOLDER)
-	set(CMAKE_FOLDER "${CMAKE_FOLDER}/zydis")
-else()
-	set(CMAKE_FOLDER zydis)
-endif()
-add_subdirectory(zydis)
-set(CMAKE_FOLDER ${CMKR_CMAKE_FOLDER})
-
 # Target vmprofiler
 set(CMKR_TARGET vmprofiler)
 set(vmprofiler_SOURCES "")
 
 list(APPEND vmprofiler_SOURCES
+	"src/vmctx.cpp"
 	"src/vmlocate.cpp"
+	"src/vmutils.cpp"
 	"include/vmctx.hpp"
 	"include/vmlocate.hpp"
 	"include/vmprofiler.hpp"
+	"include/vmutils.hpp"
 )
 
 list(APPEND vmprofiler_SOURCES
@@ -81,24 +67,6 @@ target_include_directories(vmprofiler PUBLIC
 target_link_libraries(vmprofiler PUBLIC
 	Zydis
 	linux-pe
-)
-
-unset(CMKR_TARGET)
-unset(CMKR_SOURCES)
-
-# Target linux-pe
-set(CMKR_TARGET linux-pe)
-set(linux-pe_SOURCES "")
-
-set(CMKR_SOURCES ${linux-pe_SOURCES})
-add_library(linux-pe INTERFACE)
-
-if(linux-pe_SOURCES)
-	target_sources(linux-pe INTERFACE ${linux-pe_SOURCES})
-endif()
-
-target_include_directories(linux-pe INTERFACE
-	"linux-pe/includes/"
 )
 
 unset(CMKR_TARGET)

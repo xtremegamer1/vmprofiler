@@ -24,3 +24,4 @@ compile-definitions = [
 ]
 
 [subdir.deps]
+[subdir.tests]

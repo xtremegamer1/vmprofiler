@@ -4,3 +4,6 @@
 [submodule "deps/zydis"]
 	path = deps/zydis
 	url = https://github.com/zyantific/zydis
+[submodule "tests/deps/cli-parser"]
+	path = tests/deps/cli-parser
+	url = https://githacks.org/_xeroxz/cli-parser

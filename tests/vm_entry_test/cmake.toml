@@ -1,0 +1,18 @@
+[target.cli-parser]
+type = "interface"
+include-directories = ["../deps/cli-parser"]
+
+[project]
+name = "vm_entry_test"
+
+[target.vm_entry_test]
+type = "executable"
+compile-features = ["cxx_std_20"]
+
+sources = [
+	"src/**.cpp",
+	"include/**.hpp"
+]
+
+link-libraries = ["vmprofiler", "cli-parser"]
+compile-definitions = ["NOMINMAX"]

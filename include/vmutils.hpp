@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <functional>
+#include <nt/image.hpp>
 #include <vector>
 
 using u8 = unsigned char;
@@ -39,4 +40,79 @@ inline void init() {
                        ZYDIS_FORMATTER_STYLE_INTEL);
   }
 }
+
+/// <summary>
+/// determines if a given decoded native instruction is a JCC...
+/// </summary>
+/// <param name="instr"></param>
+/// <returns></returns>
+bool is_jmp(const zydis_decoded_instr_t& instr);
+
+/// <summary>
+/// utils pertaining to native registers...
+/// </summary>
+namespace reg {
+/// <summary>
+/// converts say... AL to RAX...
+/// </summary>
+/// <param name="reg">a zydis decoded register value...</param>
+/// <returns>returns the largest width register of the given register... AL
+/// gives RAX...</returns>
+zydis_register_t to64(zydis_register_t reg);
+
+/// <summary>
+/// compares to registers with each other... calls to64 and compares...
+/// </summary>
+/// <param name="a">register a...</param>
+/// <param name="b">register b...</param>
+/// <returns>returns true if register to64(a) == to64(b)...</returns>
+bool compare(zydis_register_t a, zydis_register_t b);
+}  // namespace reg
+
+/// <summary>
+/// flatten native instruction stream, takes every JCC (follows the branch)...
+/// </summary>
+/// <param name="routine">filled with decoded instructions...</param>
+/// <param name="routine_addr">linear virtual address to start flattening
+/// from...</param> <param name="keep_jmps">keep JCC's in the flattened
+/// instruction stream...</param> <returns>returns true if flattened was
+/// successful...</returns>
+bool flatten(zydis_routine_t& routine,
+             std::uintptr_t routine_addr,
+             bool keep_jmps = false,
+             std::uint32_t max_instrs = 500,
+             std::uintptr_t module_base = 0ull);
+
+/// <summary>
+/// deadstore deobfuscation of a flattened routine...
+/// </summary>
+/// <param name="routine">reference to a flattened instruction vector...</param>
+void deobfuscate(zydis_routine_t& routine);
+
+/// <summary>
+/// small namespace that contains function wrappers to determine the validity of
+/// linear virtual addresses...
+/// </summary>
+namespace scn {
+/// <summary>
+/// determines if a pointer lands inside of a section that is readonly...
+///
+/// this also checks to make sure the section is not discardable...
+/// </summary>
+/// <param name="module_base">linear virtual address of the module....</param>
+/// <param name="ptr">linear virtual address</param>
+/// <returns>returns true if ptr lands inside of a readonly section of the
+/// module</returns>
+bool read_only(std::uint64_t module_base, std::uint64_t ptr);
+
+/// <summary>
+/// determines if a pointer lands inside of a section that is executable...
+///
+/// this also checks to make sure the section is not discardable...
+/// </summary>
+/// <param name="module_base"></param>
+/// <param name="ptr"></param>
+/// <returns></returns>
+bool executable(std::uint64_t module_base, std::uint64_t ptr);
+}  // namespace scn
 }  // namespace vm::utils

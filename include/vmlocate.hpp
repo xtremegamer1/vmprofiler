@@ -1,6 +1,6 @@
 #pragma once
 #include <nt/image.hpp>
-#include <vmprofiler.hpp>
+#include <vmutils.hpp>
 
 #define PUSH_4B_IMM "\x68\x00\x00\x00\x00"
 #define PUSH_4B_MASK "x????"

@@ -1,0 +1,6 @@
+[submodule "deps/linux-pe"]
+	path = deps/linux-pe
+	url = https://github.com/can1357/linux-pe.git
+[submodule "deps/zydis"]
+	path = deps/zydis
+	url = https://github.com/zyantific/zydis

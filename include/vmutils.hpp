@@ -2,6 +2,7 @@
 #include <Zydis/Zydis.h>
 #include <algorithm>
 #include <cstdint>
+#include <fstream>
 #include <functional>
 #include <nt/image.hpp>
 #include <vector>
@@ -41,12 +42,43 @@ inline void init() {
   }
 }
 
+inline bool open_binary_file(const std::string& file,
+                             std::vector<uint8_t>& data) {
+  std::ifstream fstr(file, std::ios::binary);
+  if (!fstr.is_open())
+    return false;
+
+  fstr.unsetf(std::ios::skipws);
+  fstr.seekg(0, std::ios::end);
+
+  const auto file_size = fstr.tellg();
+
+  fstr.seekg(NULL, std::ios::beg);
+  data.reserve(static_cast<uint32_t>(file_size));
+  data.insert(data.begin(), std::istream_iterator<uint8_t>(fstr),
+              std::istream_iterator<uint8_t>());
+  return true;
+}
+
 /// <summary>
 /// determines if a given decoded native instruction is a JCC...
 /// </summary>
 /// <param name="instr"></param>
 /// <returns></returns>
 bool is_jmp(const zydis_decoded_instr_t& instr);
+
+/// <summary>
+/// prints a disassembly view of a routine...
+/// </summary>
+/// <param name="routine">reference to a zydis_routine_t to be
+/// printed...</param>
+void print(zydis_routine_t& routine);
+
+/// <summary>
+/// prints a single disassembly view of an instruction...
+/// </summary>
+/// <param name="instr">instruction to print...</param>
+void print(const zydis_decoded_instr_t& instr);
 
 /// <summary>
 /// utils pertaining to native registers...

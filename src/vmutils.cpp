@@ -1,6 +1,21 @@
 #include <vmutils.hpp>
 
-namespace vm::locate {
+namespace vm::utils {
+void print(const zydis_decoded_instr_t& instr) {
+  char buffer[256];
+  ZydisFormatterFormatInstruction(vm::utils::g_formatter.get(), &instr, buffer,
+                                  sizeof(buffer), 0u);
+  std::puts(buffer);
+}
+
+void print(zydis_routine_t& routine) {
+  char buffer[256];
+  for (auto [instr, raw, addr] : routine) {
+    ZydisFormatterFormatInstruction(vm::utils::g_formatter.get(), &instr,
+                                    buffer, sizeof(buffer), addr);
+    std::printf("> %p %s\n", addr, buffer);
+  }
+}
 
 bool is_jmp(const zydis_decoded_instr_t& instr) {
   return instr.mnemonic >= ZYDIS_MNEMONIC_JB &&
@@ -208,4 +223,4 @@ bool executable(std::uint64_t module_base, std::uint64_t ptr) {
   return false;
 }
 }  // namespace scn
-}  // namespace vm::locate
+}  // namespace vm::utils

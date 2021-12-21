@@ -8,7 +8,7 @@ void print(const zydis_decoded_instr_t& instr) {
   std::puts(buffer);
 }
 
-void print(zydis_routine_t& routine) {
+void print(zydis_rtn_t& routine) {
   char buffer[256];
   for (auto [instr, raw, addr] : routine) {
     ZydisFormatterFormatInstruction(vm::utils::g_formatter.get(), &instr,
@@ -22,7 +22,7 @@ bool is_jmp(const zydis_decoded_instr_t& instr) {
          instr.mnemonic <= ZYDIS_MNEMONIC_JZ;
 }
 
-bool flatten(zydis_routine_t& routine,
+bool flatten(zydis_rtn_t& routine,
              std::uintptr_t routine_addr,
              bool keep_jmps,
              std::uint32_t max_instrs,
@@ -74,9 +74,9 @@ bool flatten(zydis_routine_t& routine,
   return false;
 }
 
-void deobfuscate(zydis_routine_t& routine) {
+void deobfuscate(zydis_rtn_t& routine) {
   static const auto _uses_reg = [](zydis_decoded_operand_t& op,
-                                   zydis_register_t reg) -> bool {
+                                   zydis_reg_t reg) -> bool {
     switch (op.type) {
       case ZYDIS_OPERAND_TYPE_MEMORY: {
         return vm::utils::reg::compare(op.mem.base, reg) ||
@@ -92,7 +92,7 @@ void deobfuscate(zydis_routine_t& routine) {
   };
 
   static const auto _reads = [](zydis_decoded_instr_t& instr,
-                                zydis_register_t reg) -> bool {
+                                zydis_reg_t reg) -> bool {
     if (instr.operands[0].type == ZYDIS_OPERAND_TYPE_MEMORY &&
         vm::utils::reg::compare(instr.operands[0].mem.base, reg))
       return true;
@@ -105,7 +105,7 @@ void deobfuscate(zydis_routine_t& routine) {
   };
 
   static const auto _writes = [](zydis_decoded_instr_t& instr,
-                                 zydis_register_t reg) -> bool {
+                                 zydis_reg_t reg) -> bool {
     for (auto op_idx = 0u; op_idx < instr.operand_count; ++op_idx)
       // if instruction writes to the specific register...
       if (instr.operands[op_idx].type == ZYDIS_OPERAND_TYPE_REGISTER &&
@@ -119,7 +119,8 @@ void deobfuscate(zydis_routine_t& routine) {
   std::uint32_t last_size = 0u;
   static const std::vector<ZydisMnemonic> blacklist = {
       ZYDIS_MNEMONIC_CLC, ZYDIS_MNEMONIC_BT,  ZYDIS_MNEMONIC_TEST,
-      ZYDIS_MNEMONIC_CMP, ZYDIS_MNEMONIC_CMC, ZYDIS_MNEMONIC_STC};
+      ZYDIS_MNEMONIC_CMP, ZYDIS_MNEMONIC_CMC, ZYDIS_MNEMONIC_STC,
+      ZYDIS_MNEMONIC_JMP};
 
   static const std::vector<ZydisMnemonic> whitelist = {
       ZYDIS_MNEMONIC_PUSH, ZYDIS_MNEMONIC_POP, ZYDIS_MNEMONIC_CALL,
@@ -138,7 +139,7 @@ void deobfuscate(zydis_routine_t& routine) {
         break;
       }
 
-      zydis_register_t reg = ZYDIS_REGISTER_NONE;
+      zydis_reg_t reg = ZYDIS_REGISTER_NONE;
       // look for operands with writes to a register...
       for (auto op_idx = 0u; op_idx < itr->instr.operand_count; ++op_idx)
         if (itr->instr.operands[op_idx].type == ZYDIS_OPERAND_TYPE_REGISTER &&
@@ -183,11 +184,11 @@ void deobfuscate(zydis_routine_t& routine) {
 }
 
 namespace reg {
-zydis_register_t to64(zydis_register_t reg) {
+zydis_reg_t to64(zydis_reg_t reg) {
   return ZydisRegisterGetLargestEnclosing(ZYDIS_MACHINE_MODE_LONG_64, reg);
 }
 
-bool compare(zydis_register_t a, zydis_register_t b) {
+bool compare(zydis_reg_t a, zydis_reg_t b) {
   return to64(a) == to64(b);
 }
 }  // namespace reg

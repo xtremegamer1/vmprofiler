@@ -5,6 +5,7 @@
 #include <fstream>
 #include <functional>
 #include <nt/image.hpp>
+#include <optional>
 #include <vector>
 
 using u8 = unsigned char;
@@ -13,7 +14,7 @@ using u32 = unsigned int;
 using u64 = unsigned long long;
 
 using zydis_decoded_instr_t = ZydisDecodedInstruction;
-using zydis_register_t = ZydisRegister;
+using zydis_reg_t = ZydisRegister;
 using zydis_mnemonic_t = ZydisMnemonic;
 using zydis_decoded_operand_t = ZydisDecodedOperand;
 
@@ -23,7 +24,7 @@ struct zydis_instr_t {
   std::uintptr_t addr;
 };
 
-using zydis_routine_t = std::vector<zydis_instr_t>;
+using zydis_rtn_t = std::vector<zydis_instr_t>;
 
 namespace vm::utils {
 inline thread_local std::shared_ptr<ZydisDecoder> g_decoder = nullptr;
@@ -72,7 +73,7 @@ bool is_jmp(const zydis_decoded_instr_t& instr);
 /// </summary>
 /// <param name="routine">reference to a zydis_routine_t to be
 /// printed...</param>
-void print(zydis_routine_t& routine);
+void print(zydis_rtn_t& routine);
 
 /// <summary>
 /// prints a single disassembly view of an instruction...
@@ -90,7 +91,7 @@ namespace reg {
 /// <param name="reg">a zydis decoded register value...</param>
 /// <returns>returns the largest width register of the given register... AL
 /// gives RAX...</returns>
-zydis_register_t to64(zydis_register_t reg);
+zydis_reg_t to64(zydis_reg_t reg);
 
 /// <summary>
 /// compares to registers with each other... calls to64 and compares...
@@ -98,7 +99,7 @@ zydis_register_t to64(zydis_register_t reg);
 /// <param name="a">register a...</param>
 /// <param name="b">register b...</param>
 /// <returns>returns true if register to64(a) == to64(b)...</returns>
-bool compare(zydis_register_t a, zydis_register_t b);
+bool compare(zydis_reg_t a, zydis_reg_t b);
 }  // namespace reg
 
 /// <summary>
@@ -109,7 +110,7 @@ bool compare(zydis_register_t a, zydis_register_t b);
 /// from...</param> <param name="keep_jmps">keep JCC's in the flattened
 /// instruction stream...</param> <returns>returns true if flattened was
 /// successful...</returns>
-bool flatten(zydis_routine_t& routine,
+bool flatten(zydis_rtn_t& routine,
              std::uintptr_t routine_addr,
              bool keep_jmps = false,
              std::uint32_t max_instrs = 500,
@@ -119,7 +120,7 @@ bool flatten(zydis_routine_t& routine,
 /// deadstore deobfuscation of a flattened routine...
 /// </summary>
 /// <param name="routine">reference to a flattened instruction vector...</param>
-void deobfuscate(zydis_routine_t& routine);
+void deobfuscate(zydis_rtn_t& routine);
 
 /// <summary>
 /// small namespace that contains function wrappers to determine the validity of

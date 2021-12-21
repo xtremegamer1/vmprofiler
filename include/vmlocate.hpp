@@ -6,7 +6,7 @@
 #define PUSH_4B_MASK "x????"
 
 namespace vm::locate {
-inline bool find(const zydis_routine_t& rtn,
+inline bool find(const zydis_rtn_t& rtn,
                  std::function<bool(const zydis_instr_t&)> callback) {
   auto res = std::find_if(rtn.begin(), rtn.end(), callback);
   return res != rtn.end();

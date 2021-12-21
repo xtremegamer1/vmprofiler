@@ -28,7 +28,7 @@ std::vector<vm_enter_t> get_vm_entries(std::uintptr_t module_base,
   std::uintptr_t result = module_base;
   std::vector<vm_enter_t> entries;
 
-  static const auto push_regs = [&](const zydis_routine_t& rtn) -> bool {
+  static const auto push_regs = [&](const zydis_rtn_t& rtn) -> bool {
     for (unsigned reg = ZYDIS_REGISTER_RAX; reg < ZYDIS_REGISTER_R15; ++reg) {
       auto res = std::find_if(
           rtn.begin(), rtn.end(), [&](const zydis_instr_t& instr) -> bool {
@@ -49,7 +49,7 @@ std::vector<vm_enter_t> get_vm_entries(std::uintptr_t module_base,
     result = sigscan((void*)++result, module_size - (result - module_base),
                      PUSH_4B_IMM, PUSH_4B_MASK);
 
-    zydis_routine_t rtn;
+    zydis_rtn_t rtn;
     if (!vm::utils::scn::executable(module_base, result))
       continue;
 

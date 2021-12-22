@@ -47,7 +47,8 @@ struct vinstr_t {
 
   /// <summary>
   /// size varient of the virtual instruction... I.E SREGQ would have a value of
-  /// "64" here...where the SREGDW varient would have a "32" here...
+  /// "64" here...where the SREGDW varient would have a "32" here... this is the
+  /// stack disposition essentially, or the value on the stack...
   /// </summary>
   u8 size;
 
@@ -140,7 +141,14 @@ extern profiler_t sreg;
 /// <summary>
 /// unsorted vector of profiles... they get sorted once at runtime...
 /// </summary>
-inline std::vector<profiler_t*> profiles = {&jmp};
+inline std::vector<profiler_t*> profiles = {&jmp, &sreg};
+
+/// <summary>
+/// deadstore and opaque branch removal from unicorn engine trace... this is the
+/// same algorithm as the one in vm::utils::deobfuscate...
+/// </summary>
+/// <param name="trace"></param>
+void deobfuscate(hndlr_trace_t& trace);
 
 /// <summary>
 /// sorts the profiles by descending order of matchers... this will prevent a
@@ -148,13 +156,7 @@ inline std::vector<profiler_t*> profiles = {&jmp};
 ///
 /// this function can be called multiple times...
 /// </summary>
-inline void init() {
-  if (static std::atomic_bool once = true; once.exchange(false))
-    std::sort(profiles.begin(), profiles.end(),
-              [&](profiler_t* a, profiler_t* b) -> bool {
-                return a->matchers.size() > b->matchers.size();
-              });
-}
+void init();
 
 /// <summary>
 /// determines the virtual instruction for the vm handler given vsp and vip...
@@ -163,46 +165,12 @@ inline void init() {
 /// <param name="vsp">vsp native register...</param>
 /// <param name="hndlr"></param>
 /// <returns>returns vinstr_t structure...</returns>
-inline vinstr_t determine(zydis_reg_t& vip,
-                          zydis_reg_t& vsp,
-                          hndlr_trace_t& hndlr) {
-  const auto& instrs = hndlr.m_instrs;
-  const auto profile = std::find_if(
-      profiles.begin(), profiles.end(), [&](profiler_t* profile) -> bool {
-        for (auto& matcher : profile->matchers) {
-          const auto matched =
-              std::find_if(instrs.begin(), instrs.end(),
-                           [&](const emu_instr_t& instr) -> bool {
-                             const auto& i = instr.m_instr;
-                             return matcher(vip, vsp, i);
-                           });
-          if (matched == instrs.end())
-            return false;
-        }
-        return true;
-      });
-
-  if (profile == profiles.end())
-    return vinstr_t{mnemonic_t::unknown};
-
-  auto result = (*profile)->generate(vip, vsp, hndlr);
-  return result.has_value() ? result.value() : vinstr_t{mnemonic_t::unknown};
-}
+vinstr_t determine(zydis_reg_t& vip, zydis_reg_t& vsp, hndlr_trace_t& hndlr);
 
 /// <summary>
 /// get profile from mnemonic...
 /// </summary>
 /// <param name="mnemonic">mnemonic of the profile to get...</param>
 /// <returns>pointer to the profile...</returns>
-inline profiler_t* get_profile(mnemonic_t mnemonic) {
-  if (mnemonic == mnemonic_t::unknown)
-    return nullptr;
-
-  const auto res = std::find_if(profiles.begin(), profiles.end(),
-                                [&](profiler_t* profile) -> bool {
-                                  return profile->mnemonic == mnemonic;
-                                });
-
-  return res == profiles.end() ? nullptr : *res;
-}
+profiler_t* get_profile(mnemonic_t mnemonic);
 }  // namespace vm::instrs

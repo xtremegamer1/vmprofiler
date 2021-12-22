@@ -51,6 +51,7 @@ set(vmprofiler_SOURCES "")
 
 list(APPEND vmprofiler_SOURCES
 	"src/vmctx.cpp"
+	"src/vminstrs.cpp"
 	"src/vmlocate.cpp"
 	"src/vmprofiles/jmp.cpp"
 	"src/vmprofiles/sreg.cpp"

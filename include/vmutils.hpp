@@ -69,6 +69,13 @@ inline bool open_binary_file(const std::string& file,
 bool is_jmp(const zydis_decoded_instr_t& instr);
 
 /// <summary>
+/// used by profiles to see if an instruction is a MOV/SX/ZX...
+/// </summary>
+/// <param name="instr"></param>
+/// <returns></returns>
+bool is_mov(const zydis_decoded_instr_t& instr);
+
+/// <summary>
 /// prints a disassembly view of a routine...
 /// </summary>
 /// <param name="routine">reference to a zydis_routine_t to be

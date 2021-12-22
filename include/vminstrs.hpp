@@ -50,7 +50,7 @@ struct vinstr_t {
   /// "64" here...where the SREGDW varient would have a "32" here... this is the
   /// stack disposition essentially, or the value on the stack...
   /// </summary>
-  u8 size;
+  u8 stack_size;
 
   struct {
     /// <summary>
@@ -84,6 +84,7 @@ struct emu_instr_t {
 /// </summary>
 struct hndlr_trace_t {
   std::uintptr_t m_hndlr_addr;
+  uc_engine* m_uc;
   zydis_reg_t m_vip, m_vsp;
   std::vector<emu_instr_t> m_instrs;
 };
@@ -137,11 +138,86 @@ struct profiler_t {
 /// </summary>
 extern profiler_t jmp;
 extern profiler_t sreg;
+extern profiler_t lreg;
+extern profiler_t lconst;
 
 /// <summary>
 /// unsorted vector of profiles... they get sorted once at runtime...
 /// </summary>
-inline std::vector<profiler_t*> profiles = {&jmp, &sreg};
+inline std::vector<profiler_t*> profiles = {&jmp, &sreg, &lreg, &lconst};
+
+/// <summary>
+/// no i did not make this by hand, you cannot clown upon me!
+/// </summary>
+inline std::map<zydis_reg_t, uc_x86_reg> reg_map = {
+    {ZYDIS_REGISTER_AL, UC_X86_REG_AL},
+    {ZYDIS_REGISTER_CL, UC_X86_REG_CL},
+    {ZYDIS_REGISTER_DL, UC_X86_REG_DL},
+    {ZYDIS_REGISTER_BL, UC_X86_REG_BL},
+    {ZYDIS_REGISTER_AH, UC_X86_REG_AH},
+    {ZYDIS_REGISTER_CH, UC_X86_REG_CH},
+    {ZYDIS_REGISTER_DH, UC_X86_REG_DH},
+    {ZYDIS_REGISTER_BH, UC_X86_REG_BH},
+    {ZYDIS_REGISTER_SPL, UC_X86_REG_SPL},
+    {ZYDIS_REGISTER_BPL, UC_X86_REG_BPL},
+    {ZYDIS_REGISTER_SIL, UC_X86_REG_SIL},
+    {ZYDIS_REGISTER_DIL, UC_X86_REG_DIL},
+    {ZYDIS_REGISTER_R8B, UC_X86_REG_R8B},
+    {ZYDIS_REGISTER_R9B, UC_X86_REG_R9B},
+    {ZYDIS_REGISTER_R10B, UC_X86_REG_R10B},
+    {ZYDIS_REGISTER_R11B, UC_X86_REG_R11B},
+    {ZYDIS_REGISTER_R12B, UC_X86_REG_R12B},
+    {ZYDIS_REGISTER_R13B, UC_X86_REG_R13B},
+    {ZYDIS_REGISTER_R14B, UC_X86_REG_R14B},
+    {ZYDIS_REGISTER_R15B, UC_X86_REG_R15B},
+    {ZYDIS_REGISTER_AX, UC_X86_REG_AX},
+    {ZYDIS_REGISTER_CX, UC_X86_REG_CX},
+    {ZYDIS_REGISTER_DX, UC_X86_REG_DX},
+    {ZYDIS_REGISTER_BX, UC_X86_REG_BX},
+    {ZYDIS_REGISTER_SP, UC_X86_REG_SP},
+    {ZYDIS_REGISTER_BP, UC_X86_REG_BP},
+    {ZYDIS_REGISTER_SI, UC_X86_REG_SI},
+    {ZYDIS_REGISTER_DI, UC_X86_REG_DI},
+    {ZYDIS_REGISTER_R8W, UC_X86_REG_R8W},
+    {ZYDIS_REGISTER_R9W, UC_X86_REG_R9W},
+    {ZYDIS_REGISTER_R10W, UC_X86_REG_R10W},
+    {ZYDIS_REGISTER_R11W, UC_X86_REG_R11W},
+    {ZYDIS_REGISTER_R12W, UC_X86_REG_R12W},
+    {ZYDIS_REGISTER_R13W, UC_X86_REG_R13W},
+    {ZYDIS_REGISTER_R14W, UC_X86_REG_R14W},
+    {ZYDIS_REGISTER_R15W, UC_X86_REG_R15W},
+    {ZYDIS_REGISTER_EAX, UC_X86_REG_EAX},
+    {ZYDIS_REGISTER_ECX, UC_X86_REG_ECX},
+    {ZYDIS_REGISTER_EDX, UC_X86_REG_EDX},
+    {ZYDIS_REGISTER_EBX, UC_X86_REG_EBX},
+    {ZYDIS_REGISTER_ESP, UC_X86_REG_ESP},
+    {ZYDIS_REGISTER_EBP, UC_X86_REG_EBP},
+    {ZYDIS_REGISTER_ESI, UC_X86_REG_ESI},
+    {ZYDIS_REGISTER_EDI, UC_X86_REG_EDI},
+    {ZYDIS_REGISTER_R8D, UC_X86_REG_R8D},
+    {ZYDIS_REGISTER_R9D, UC_X86_REG_R9D},
+    {ZYDIS_REGISTER_R10D, UC_X86_REG_R10D},
+    {ZYDIS_REGISTER_R11D, UC_X86_REG_R11D},
+    {ZYDIS_REGISTER_R12D, UC_X86_REG_R12D},
+    {ZYDIS_REGISTER_R13D, UC_X86_REG_R13D},
+    {ZYDIS_REGISTER_R14D, UC_X86_REG_R14D},
+    {ZYDIS_REGISTER_R15D, UC_X86_REG_R15D},
+    {ZYDIS_REGISTER_RAX, UC_X86_REG_RAX},
+    {ZYDIS_REGISTER_RCX, UC_X86_REG_RCX},
+    {ZYDIS_REGISTER_RDX, UC_X86_REG_RDX},
+    {ZYDIS_REGISTER_RBX, UC_X86_REG_RBX},
+    {ZYDIS_REGISTER_RSP, UC_X86_REG_RSP},
+    {ZYDIS_REGISTER_RBP, UC_X86_REG_RBP},
+    {ZYDIS_REGISTER_RSI, UC_X86_REG_RSI},
+    {ZYDIS_REGISTER_RDI, UC_X86_REG_RDI},
+    {ZYDIS_REGISTER_R8, UC_X86_REG_R8},
+    {ZYDIS_REGISTER_R9, UC_X86_REG_R9},
+    {ZYDIS_REGISTER_R10, UC_X86_REG_R10},
+    {ZYDIS_REGISTER_R11, UC_X86_REG_R11},
+    {ZYDIS_REGISTER_R12, UC_X86_REG_R12},
+    {ZYDIS_REGISTER_R13, UC_X86_REG_R13},
+    {ZYDIS_REGISTER_R14, UC_X86_REG_R14},
+    {ZYDIS_REGISTER_R15, UC_X86_REG_R15}};
 
 /// <summary>
 /// deadstore and opaque branch removal from unicorn engine trace... this is the

@@ -22,6 +22,12 @@ bool is_jmp(const zydis_decoded_instr_t& instr) {
          instr.mnemonic <= ZYDIS_MNEMONIC_JZ;
 }
 
+bool is_mov(const zydis_decoded_instr_t& instr) {
+  return instr.mnemonic == ZYDIS_MNEMONIC_MOV ||
+         instr.mnemonic == ZYDIS_MNEMONIC_MOVSX ||
+         instr.mnemonic == ZYDIS_MNEMONIC_MOVZX;
+}
+
 bool flatten(zydis_rtn_t& routine,
              std::uintptr_t routine_addr,
              bool keep_jmps,

@@ -123,6 +123,10 @@ profiler_t jmp = {
         if (mov_reg_vsp != instrs.end())
           vsp = mov_reg_vsp->m_instr.operands[0].reg.value;
       }
-      return vinstr_t{mnemonic_t::jmp};
+
+      vinstr_t res;
+      memset(&res, NULL, sizeof vinstr_t);
+      res.mnemonic = mnemonic_t::jmp;
+      return res;
     }};
 }

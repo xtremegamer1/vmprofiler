@@ -17,6 +17,7 @@ include-directories = [
 link-libraries = [
     "Zydis",
     "linux-pe",
+    "unicorn"
 ]
 
 compile-definitions = [

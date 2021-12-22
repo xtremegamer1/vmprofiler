@@ -4,8 +4,8 @@ namespace vm::instrs {
 profiler_t jmp = {
     "JMP",
     mnemonic_t::jmp,
-    // MOV REG, [VSP]
-    {{[&](const zydis_reg_t vip,
+    {{// MOV REG, [VSP]
+      [&](const zydis_reg_t vip,
           const zydis_reg_t vsp,
           const zydis_decoded_instr_t& instr) -> bool {
         return instr.mnemonic == ZYDIS_MNEMONIC_MOV &&
@@ -34,10 +34,11 @@ profiler_t jmp = {
       }}},
     [&](zydis_reg_t& vip,
         zydis_reg_t& vsp,
-        zydis_rtn_t& hndlr) -> std::optional<vinstr_t> {
+        hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
+      const auto& instrs = hndlr.m_instrs;
       const auto xchg = std::find_if(
-          hndlr.begin(), hndlr.end(), [&](const zydis_instr_t& instr) -> bool {
-            const auto& i = instr.instr;
+          instrs.begin(), instrs.end(), [&](const emu_instr_t& instr) -> bool {
+            const auto& i = instr.m_instr;
             return i.mnemonic == ZYDIS_MNEMONIC_XCHG &&
                    i.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                    i.operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER &&
@@ -50,77 +51,77 @@ profiler_t jmp = {
           });
 
       // this JMP virtual instruction changes VSP as well as VIP...
-      if (xchg != hndlr.end()) {
+      if (xchg != instrs.end()) {
         // grab the register that isnt VSP in the XCHG...
         // xchg reg, vsp or xchg vsp, reg...
-        zydis_reg_t write_dep = xchg->instr.operands[0].reg.value != vsp
-                                    ? xchg->instr.operands[0].reg.value
-                                    : xchg->instr.operands[1].reg.value;
+        zydis_reg_t write_dep = xchg->m_instr.operands[0].reg.value != vsp
+                                    ? xchg->m_instr.operands[0].reg.value
+                                    : xchg->m_instr.operands[1].reg.value;
 
         // update VIP... VSP becomes VIP... with the XCHG...
-        vip = xchg->instr.operands[0].reg.value != vsp
-                  ? xchg->instr.operands[1].reg.value
-                  : xchg->instr.operands[0].reg.value;
+        vip = xchg->m_instr.operands[0].reg.value != vsp
+                  ? xchg->m_instr.operands[1].reg.value
+                  : xchg->m_instr.operands[0].reg.value;
 
         // find the next MOV REG, write_dep... this REG will be VSP...
         const auto mov_reg_write_dep = std::find_if(
-            xchg, hndlr.end(), [&](const zydis_instr_t& instr) -> bool {
-              const auto& i = instr.instr;
+            xchg, instrs.end(), [&](const emu_instr_t& instr) -> bool {
+              const auto& i = instr.m_instr;
               return i.mnemonic == ZYDIS_MNEMONIC_MOV &&
                      i.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                      i.operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                      i.operands[1].reg.value == write_dep;
             });
 
-        if (mov_reg_write_dep == hndlr.end())
+        if (mov_reg_write_dep == instrs.end())
           return {};
 
-        vsp = mov_reg_write_dep->instr.operands[0].reg.value;
+        vsp = mov_reg_write_dep->m_instr.operands[0].reg.value;
       } else {
         // find the MOV REG, [VSP] instruction...
         const auto mov_reg_deref_vsp = std::find_if(
-            hndlr.begin(), hndlr.end(),
-            [&](const zydis_instr_t& instr) -> bool {
-              const auto& i = instr.instr;
+            instrs.begin(), instrs.end(),
+            [&](const emu_instr_t& instr) -> bool {
+              const auto& i = instr.m_instr;
               return i.mnemonic == ZYDIS_MNEMONIC_MOV &&
                      i.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                      i.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&
                      i.operands[1].mem.base == vsp;
             });
 
-        if (mov_reg_deref_vsp == hndlr.end())
+        if (mov_reg_deref_vsp == instrs.end())
           return {};
 
         // find the MOV REG, mov_reg_deref_vsp->operands[0].reg.value
         const auto mov_vip_reg = std::find_if(
-            mov_reg_deref_vsp, hndlr.end(),
-            [&](const zydis_instr_t& instr) -> bool {
-              const auto& i = instr.instr;
+            mov_reg_deref_vsp, instrs.end(),
+            [&](const emu_instr_t& instr) -> bool {
+              const auto& i = instr.m_instr;
               return i.mnemonic == ZYDIS_MNEMONIC_MOV &&
                      i.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                      i.operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                      i.operands[1].reg.value ==
-                         mov_reg_deref_vsp->instr.operands[0].reg.value;
+                         mov_reg_deref_vsp->m_instr.operands[0].reg.value;
             });
 
-        if (mov_vip_reg == hndlr.end())
+        if (mov_vip_reg == instrs.end())
           return {};
 
-        vip = mov_vip_reg->instr.operands[0].reg.value;
+        vip = mov_vip_reg->m_instr.operands[0].reg.value;
 
         // see if VSP gets updated as well...
         const auto mov_reg_vsp = std::find_if(
-            mov_reg_deref_vsp, hndlr.end(),
-            [&](const zydis_instr_t& instr) -> bool {
-              const auto& i = instr.instr;
+            mov_reg_deref_vsp, instrs.end(),
+            [&](const emu_instr_t& instr) -> bool {
+              const auto& i = instr.m_instr;
               return i.mnemonic == ZYDIS_MNEMONIC_MOV &&
                      i.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                      i.operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                      i.operands[1].reg.value == vsp;
             });
 
-        if (mov_reg_vsp != hndlr.end())
-          vsp = mov_reg_vsp->instr.operands[0].reg.value;
+        if (mov_reg_vsp != instrs.end())
+          vsp = mov_reg_vsp->m_instr.operands[0].reg.value;
       }
       return vinstr_t{mnemonic_t::jmp};
     }};

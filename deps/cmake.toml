@@ -6,6 +6,7 @@ ZYDIS_FUZZ_AFL_FAST = false
 ZYDIS_LIBFUZZER = false
 
 [subdir.zydis]
+[subdir.unicorn]
 
 [target.linux-pe]
 type = "interface"

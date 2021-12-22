@@ -1,4 +1,5 @@
 #pragma once
+#include <vminstrs.hpp>
 #include <vmutils.hpp>
 
 namespace vm {

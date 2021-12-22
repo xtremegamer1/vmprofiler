@@ -90,6 +90,7 @@ target_include_directories(vmprofiler PUBLIC
 target_link_libraries(vmprofiler PUBLIC
 	Zydis
 	linux-pe
+	unicorn
 )
 
 unset(CMKR_TARGET)

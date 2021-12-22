@@ -119,8 +119,7 @@ void deobfuscate(zydis_rtn_t& routine) {
   std::uint32_t last_size = 0u;
   static const std::vector<ZydisMnemonic> blacklist = {
       ZYDIS_MNEMONIC_CLC, ZYDIS_MNEMONIC_BT,  ZYDIS_MNEMONIC_TEST,
-      ZYDIS_MNEMONIC_CMP, ZYDIS_MNEMONIC_CMC, ZYDIS_MNEMONIC_STC,
-      ZYDIS_MNEMONIC_JMP};
+      ZYDIS_MNEMONIC_CMP, ZYDIS_MNEMONIC_CMC, ZYDIS_MNEMONIC_STC};
 
   static const std::vector<ZydisMnemonic> whitelist = {
       ZYDIS_MNEMONIC_PUSH, ZYDIS_MNEMONIC_POP, ZYDIS_MNEMONIC_CALL,
@@ -135,6 +134,11 @@ void deobfuscate(zydis_rtn_t& routine) {
 
       if (std::find(blacklist.begin(), blacklist.end(), itr->instr.mnemonic) !=
           blacklist.end()) {
+        routine.erase(itr);
+        break;
+      }
+
+      if (is_jmp(itr->instr)) {
         routine.erase(itr);
         break;
       }

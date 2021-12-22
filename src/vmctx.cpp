@@ -11,6 +11,9 @@ vmctx_t::vmctx_t(std::uintptr_t module_base,
       m_image_size(image_size) {}
 
 bool vmctx_t::init() {
+  vm::utils::init();
+  vm::instrs::init();
+
   // flatten and deobfuscate the vm entry...
   if (!vm::utils::flatten(m_vm_entry, m_module_base + m_vm_entry_rva))
     return false;

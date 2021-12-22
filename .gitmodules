@@ -7,3 +7,6 @@
 [submodule "tests/deps/cli-parser"]
 	path = tests/deps/cli-parser
 	url = https://githacks.org/_xeroxz/cli-parser
+[submodule "deps/unicorn"]
+	path = deps/unicorn
+	url = https://github.com/unicorn-engine/unicorn.git

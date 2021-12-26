@@ -145,6 +145,14 @@ std::vector<vm_enter_t> get_vm_entries(std::uintptr_t module_base,
         }))
       continue;
 
+    // check for invalid instructions... such as INT instructions...
+    if (vm::locate::find(rtn, [&](const zydis_instr_t& instr) -> bool {
+          const auto& i = instr.instr;
+          return i.mnemonic >= ZYDIS_MNEMONIC_INT &&
+                 i.mnemonic <= ZYDIS_MNEMONIC_INT3;
+        }))
+      continue;
+
     // if code execution gets to here then we can assume this is a legit vm
     // entry... its time to build a vm_enter_t... first we check to see if an
     // existing entry already exits...

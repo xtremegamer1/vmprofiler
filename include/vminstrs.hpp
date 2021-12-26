@@ -140,11 +140,12 @@ extern profiler_t jmp;
 extern profiler_t sreg;
 extern profiler_t lreg;
 extern profiler_t lconst;
+extern profiler_t add;
 
 /// <summary>
 /// unsorted vector of profiles... they get sorted once at runtime...
 /// </summary>
-inline std::vector<profiler_t*> profiles = {&jmp, &sreg, &lreg, &lconst};
+inline std::vector<profiler_t*> profiles = {&add, &jmp, &sreg, &lreg, &lconst};
 
 /// <summary>
 /// no i did not make this by hand, you cannot clown upon me!
@@ -250,3 +251,43 @@ vinstr_t determine(zydis_reg_t& vip, zydis_reg_t& vsp, hndlr_trace_t& hndlr);
 /// <returns>pointer to the profile...</returns>
 profiler_t* get_profile(mnemonic_t mnemonic);
 }  // namespace vm::instrs
+
+// MOV REG, [VIP]
+#define IMM_FETCH                                                   \
+  [&](const zydis_reg_t vip, const zydis_reg_t vsp,                 \
+      const zydis_decoded_instr_t& instr) -> bool {                 \
+    return vm::utils::is_mov(instr) &&                              \
+           instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER && \
+           instr.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&   \
+           instr.operands[1].mem.base == vip;                       \
+  }
+
+// MOV [VSP], REG
+#define STR_VALUE                                                 \
+  [&](const zydis_reg_t vip, const zydis_reg_t vsp,               \
+      const zydis_decoded_instr_t& instr) -> bool {               \
+    return instr.mnemonic == ZYDIS_MNEMONIC_MOV &&                \
+           instr.operands[0].type == ZYDIS_OPERAND_TYPE_MEMORY && \
+           instr.operands[0].mem.base == vsp &&                   \
+           instr.operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER; \
+  }
+
+// MOV REG, [VSP]
+#define LOAD_VALUE                                                  \
+  [&](const zydis_reg_t vip, const zydis_reg_t vsp,                 \
+      const zydis_decoded_instr_t& instr) -> bool {                 \
+    return instr.mnemonic == ZYDIS_MNEMONIC_MOV &&                  \
+           instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER && \
+           instr.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&   \
+           instr.operands[1].mem.base == vsp;                       \
+  }
+
+// SUB VSP, OFFSET
+#define SUB_VSP                                                     \
+  [&](const zydis_reg_t vip, const zydis_reg_t vsp,                 \
+      const zydis_decoded_instr_t& instr) -> bool {                 \
+    return instr.mnemonic == ZYDIS_MNEMONIC_SUB &&                  \
+           instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER && \
+           instr.operands[0].reg.value == vsp &&                    \
+           instr.operands[1].type == ZYDIS_OPERAND_TYPE_IMMEDIATE;  \
+  }

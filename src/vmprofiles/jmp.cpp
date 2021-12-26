@@ -5,14 +5,7 @@ profiler_t jmp = {
     "JMP",
     mnemonic_t::jmp,
     {{// MOV REG, [VSP]
-      [&](const zydis_reg_t vip,
-          const zydis_reg_t vsp,
-          const zydis_decoded_instr_t& instr) -> bool {
-        return instr.mnemonic == ZYDIS_MNEMONIC_MOV &&
-               instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
-               instr.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&
-               instr.operands[1].mem.base == vsp;
-      },
+      LOAD_VALUE,
       // ADD VSP, 8
       [&](const zydis_reg_t vip,
           const zydis_reg_t vsp,
@@ -45,9 +38,6 @@ profiler_t jmp = {
     [&](zydis_reg_t& vip,
         zydis_reg_t& vsp,
         hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
-      std::printf("> found a jmp...\n");
-      std::getchar();
-
       const auto& instrs = hndlr.m_instrs;
       const auto xchg = std::find_if(
           instrs.begin(), instrs.end(), [&](const emu_instr_t& instr) -> bool {

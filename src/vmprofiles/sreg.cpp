@@ -5,14 +5,7 @@ profiler_t sreg = {
     "SREG",
     mnemonic_t::sreg,
     {{// MOV REG, [VSP]
-      [&](const zydis_reg_t vip,
-          const zydis_reg_t vsp,
-          const zydis_decoded_instr_t& instr) -> bool {
-        return instr.mnemonic == ZYDIS_MNEMONIC_MOV &&
-               instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
-               instr.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&
-               instr.operands[1].mem.base == vsp;
-      },
+      LOAD_VALUE,
       // ADD VSP, OFFSET
       [&](const zydis_reg_t vip,
           const zydis_reg_t vsp,
@@ -23,14 +16,7 @@ profiler_t sreg = {
                instr.operands[1].type == ZYDIS_OPERAND_TYPE_IMMEDIATE;
       },
       // MOV REG, [VIP]
-      [&](const zydis_reg_t vip,
-          const zydis_reg_t vsp,
-          const zydis_decoded_instr_t& instr) -> bool {
-        return vm::utils::is_mov(instr) &&
-               instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
-               instr.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&
-               instr.operands[1].mem.base == vip;
-      },
+      IMM_FETCH,
       // MOV [RSP+REG], REG
       [&](const zydis_reg_t vip,
           const zydis_reg_t vsp,

@@ -58,6 +58,10 @@ profiler_t lconst = {
           vm::instrs::reg_map[mov_vsp_imm->m_instr.operands[1].reg.value];
 
       uc_reg_read(hndlr.m_uc, imm_reg, &res.imm.val);
+
+      res.imm.val <<= (64 - res.imm.size);
+      res.imm.val >>= (64 - res.imm.size);
+
       uc_context_restore(hndlr.m_uc, backup);
       uc_context_free(backup);
       return res;

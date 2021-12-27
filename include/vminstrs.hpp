@@ -141,11 +141,17 @@ extern profiler_t sreg;
 extern profiler_t lreg;
 extern profiler_t lconst;
 extern profiler_t add;
+extern profiler_t lvsp;
+extern profiler_t svsp;
+extern profiler_t nand;
+extern profiler_t read;
+extern profiler_t write;
 
 /// <summary>
 /// unsorted vector of profiles... they get sorted once at runtime...
 /// </summary>
-inline std::vector<profiler_t*> profiles = {&add, &jmp, &sreg, &lreg, &lconst};
+inline std::vector<profiler_t*> profiles = {
+    &write, &svsp, &read, &nand, &lvsp, &add, &jmp, &sreg, &lreg, &lconst};
 
 /// <summary>
 /// no i did not make this by hand, you cannot clown upon me!

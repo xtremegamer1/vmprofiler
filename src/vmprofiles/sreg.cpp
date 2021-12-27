@@ -67,6 +67,10 @@ profiler_t sreg = {
           vm::instrs::reg_map[mov_vreg_value->m_instr.operands[0].mem.index];
 
       uc_reg_read(hndlr.m_uc, idx_reg, &res.imm.val);
+
+      res.imm.val <<= (64 - res.imm.size);
+      res.imm.val >>= (64 - res.imm.size);
+
       uc_context_restore(hndlr.m_uc, backup);
       uc_context_free(backup);
       return res;

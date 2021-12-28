@@ -65,6 +65,7 @@ list(APPEND vmprofiler_SOURCES
 	"src/vmprofiles/shr.cpp"
 	"src/vmprofiles/sreg.cpp"
 	"src/vmprofiles/svsp.cpp"
+	"src/vmprofiles/vmexit.cpp"
 	"src/vmprofiles/write.cpp"
 	"src/vmutils.cpp"
 	"include/vmctx.hpp"

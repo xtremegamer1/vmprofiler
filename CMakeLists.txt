@@ -62,6 +62,7 @@ list(APPEND vmprofiler_SOURCES
 	"src/vmprofiles/nand.cpp"
 	"src/vmprofiles/nor.cpp"
 	"src/vmprofiles/read.cpp"
+	"src/vmprofiles/shr.cpp"
 	"src/vmprofiles/sreg.cpp"
 	"src/vmprofiles/svsp.cpp"
 	"src/vmprofiles/write.cpp"

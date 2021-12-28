@@ -1,9 +1,9 @@
 #include <vminstrs.hpp>
 
 namespace vm::instrs {
-profiler_t nor = {
-    "NOR",
-    mnemonic_t::nor,
+profiler_t imul = {
+    "IMUL",
+    mnemonic_t::imul,
     {{// MOV REG, [VSP]
       LOAD_VALUE,
       // MOV REG, [VSP+OFFSET]
@@ -16,20 +16,12 @@ profiler_t nor = {
                instr.operands[1].mem.base == vsp &&
                instr.operands[1].mem.disp.has_displacement;
       },
-      // NOT REG
+      // IMUL REG
       [&](const zydis_reg_t vip,
           const zydis_reg_t vsp,
           const zydis_decoded_instr_t& instr) -> bool {
-        return instr.mnemonic == ZYDIS_MNEMONIC_NOT &&
+        return instr.mnemonic == ZYDIS_MNEMONIC_IMUL &&
                instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER;
-      },
-      // OR REG, REG
-      [&](const zydis_reg_t vip,
-          const zydis_reg_t vsp,
-          const zydis_decoded_instr_t& instr) -> bool {
-        return instr.mnemonic == ZYDIS_MNEMONIC_OR &&
-               instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
-               instr.operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER;
       },
       // MOV [VSP+OFFSET], REG
       [&](const zydis_reg_t vip,
@@ -58,22 +50,18 @@ profiler_t nor = {
     [&](zydis_reg_t& vip,
         zydis_reg_t& vsp,
         hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
-      vinstr_t res{mnemonic_t::nand};
+      vinstr_t res{mnemonic_t::imul};
       res.imm.has_imm = false;
 
-      // MOV [VSP+OFFSET], REG
-      const auto mov_vsp_reg = std::find_if(
+      const auto imul_reg = std::find_if(
           hndlr.m_instrs.begin(), hndlr.m_instrs.end(),
           [&](emu_instr_t& instr) -> bool {
             const auto& i = instr.m_instr;
-            return i.mnemonic == ZYDIS_MNEMONIC_MOV &&
-                   i.operands[0].type == ZYDIS_OPERAND_TYPE_MEMORY &&
-                   i.operands[0].mem.base == vsp &&
-                   i.operands[0].mem.disp.has_displacement &&
-                   i.operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER;
+            return i.mnemonic == ZYDIS_MNEMONIC_IMUL &&
+                   i.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER;
           });
 
-      res.stack_size = mov_vsp_reg->m_instr.operands[1].size;
+      res.stack_size = imul_reg->m_instr.operands[0].size;
       return res;
     }};
 }

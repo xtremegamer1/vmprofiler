@@ -54,6 +54,7 @@ list(APPEND vmprofiler_SOURCES
 	"src/vminstrs.cpp"
 	"src/vmlocate.cpp"
 	"src/vmprofiles/add.cpp"
+	"src/vmprofiles/imul.cpp"
 	"src/vmprofiles/jmp.cpp"
 	"src/vmprofiles/lconst.cpp"
 	"src/vmprofiles/lreg.cpp"

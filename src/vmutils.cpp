@@ -99,12 +99,9 @@ void deobfuscate(zydis_rtn_t& routine) {
 
   static const auto _reads = [](zydis_decoded_instr_t& instr,
                                 zydis_reg_t reg) -> bool {
-    if (instr.operands[0].type == ZYDIS_OPERAND_TYPE_MEMORY &&
-        vm::utils::reg::compare(instr.operands[0].mem.base, reg))
-      return true;
-
     for (auto op_idx = 0u; op_idx < instr.operand_count; ++op_idx)
-      if (instr.operands[op_idx].actions & ZYDIS_OPERAND_ACTION_READ &&
+      if ((instr.operands[op_idx].actions & ZYDIS_OPERAND_ACTION_READ ||
+           instr.operands[op_idx].type == ZYDIS_OPERAND_TYPE_MEMORY) &&
           _uses_reg(instr.operands[op_idx], reg))
         return true;
     return false;
@@ -113,10 +110,8 @@ void deobfuscate(zydis_rtn_t& routine) {
   static const auto _writes = [](zydis_decoded_instr_t& instr,
                                  zydis_reg_t reg) -> bool {
     for (auto op_idx = 0u; op_idx < instr.operand_count; ++op_idx)
-      // if instruction writes to the specific register...
       if (instr.operands[op_idx].type == ZYDIS_OPERAND_TYPE_REGISTER &&
           instr.operands[op_idx].actions & ZYDIS_OPERAND_ACTION_WRITE &&
-          !(instr.operands[op_idx].actions & ZYDIS_OPERAND_ACTION_READ) &&
           vm::utils::reg::compare(instr.operands[op_idx].reg.value, reg))
         return true;
     return false;
@@ -147,11 +142,6 @@ void deobfuscate(zydis_rtn_t& routine) {
 
       if (std::find(blacklist.begin(), blacklist.end(), itr->instr.mnemonic) !=
           blacklist.end()) {
-        routine.erase(itr);
-        break;
-      }
-
-      if (is_jmp(itr->instr)) {
         routine.erase(itr);
         break;
       }

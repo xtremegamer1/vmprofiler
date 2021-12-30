@@ -19,7 +19,6 @@ bool vmctx_t::init() {
     return false;
 
   vm::utils::deobfuscate(m_vm_entry);
-  vm::utils::print(m_vm_entry);
 
   // find mov reg, [rsp+0x90]. this register will be VIP...
   const auto vip_fetch = std::find_if(

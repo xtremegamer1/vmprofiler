@@ -72,10 +72,106 @@ struct vinstr_t {
 };
 
 /// <summary>
+/// virtual branch type...
+/// </summary>
+enum class vbranch_type {
+  /// <summary>
+  /// vmexit
+  /// </summary>
+  none,
+
+  /// <summary>
+  /// virtual jcc
+  /// </summary>
+  jcc,
+
+  /// <summary>
+  /// absolute jmp...
+  /// </summary>
+  absolute,
+
+  /// <summary>
+  /// jmp table, either indirect or direct...
+  /// </summary>
+  table
+};
+
+/// <summary>
+/// virtual code block
+/// </summary>
+struct vblk_t {
+  /// <summary>
+  /// start address VIP of this basic block...
+  /// </summary>
+  struct {
+    /// <summary>
+    /// relative virtual address...
+    /// </summary>
+    std::uint32_t rva;
+
+    /// <summary>
+    /// image based relative virtual address...
+    /// </summary>
+    std::uintptr_t img_base;
+  } m_vip;
+
+  struct {
+    /// <summary>
+    /// unicorn-engine cpu context of the first instruction of the jmp
+    /// handler...
+    /// </summary>
+    uc_context* ctx;
+
+    /// <summary>
+    /// unicorn-engine stack of the first instruction of the jmp handler...
+    /// </summary>
+    std::uint8_t* stack;
+  } m_jmp;
+
+  /// <summary>
+  /// vector of virtual instructions for this basic block...
+  /// </summary>
+  std::vector<vm::instrs::vinstr_t> m_vinstrs;
+
+  /// <summary>
+  /// virtual branch type...
+  /// </summary>
+  vbranch_type branch_type;
+
+  /// <summary>
+  /// vector of virtual instruction pointers. one for each branch...
+  /// </summary>
+  std::vector<std::uintptr_t> branches;
+};
+
+/// <summary>
+/// virtual routine structure
+/// </summary>
+struct vrtn_t {
+  /// <summary>
+  /// relative virtual address to the first instruction of the vm enter...
+  /// </summary>
+  std::uint32_t m_rva;
+
+  /// <summary>
+  /// vector of virtual code blocks... these virtual code blocks contain virtual
+  /// instructions...
+  /// </summary>
+  std::vector<vblk_t> m_blks;
+};
+
+/// <summary>
 /// emu instruction containing current cpu register values and such...
 /// </summary>
 struct emu_instr_t {
+  /// <summary>
+  /// decoded instruction...
+  /// </summary>
   zydis_decoded_instr_t m_instr;
+
+  /// <summary>
+  /// cpu context before execution of this instruction...
+  /// </summary>
   uc_context* m_cpu;
 };
 
@@ -84,9 +180,30 @@ struct emu_instr_t {
 /// contains some information about the virtual machine such as vip and vsp...
 /// </summary>
 struct hndlr_trace_t {
-  std::uintptr_t m_hndlr_addr;
+  /// <summary>
+  /// pointer to the unicorn-engine... used by profilers...
+  /// </summary>
   uc_engine* m_uc;
-  zydis_reg_t m_vip, m_vsp;
+
+  /// <summary>
+  /// copy of the stack at the very first instruction of the virtual machine
+  /// handler...
+  /// </summary>
+  std::uint8_t* m_stack;
+
+  /// <summary>
+  /// native register used for virtual instruction pointer...
+  /// </summary>
+  zydis_reg_t m_vip;
+
+  /// <summary>
+  /// native register used for the virtual stack pointer...
+  /// </summary>
+  zydis_reg_t m_vsp;
+
+  /// <summary>
+  /// vector of emulated, diassembled instructions...
+  /// </summary>
   std::vector<emu_instr_t> m_instrs;
 };
 

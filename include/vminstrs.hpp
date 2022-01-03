@@ -115,6 +115,15 @@ struct vblk_t {
     std::uintptr_t img_base;
   } m_vip;
 
+  /// <summary>
+  /// virtual instruction pointer and virtual stack pointer used for this basic
+  /// block...
+  /// </summary>
+  struct {
+    zydis_reg_t vip;
+    zydis_reg_t vsp;
+  } m_vm;
+
   struct {
     /// <summary>
     /// unicorn-engine cpu context of the first instruction of the jmp

@@ -2,6 +2,9 @@
 #include <unicorn/unicorn.h>
 #include <vmutils.hpp>
 
+#define VIRTUAL_REGISTER_COUNT 24
+#define VIRTUAL_SEH_REGISTER 24
+
 namespace vm::instrs {
 /// <summary>
 /// mnemonic representation of supported virtual instructions...
@@ -135,6 +138,11 @@ struct vblk_t {
     /// unicorn-engine stack of the first instruction of the jmp handler...
     /// </summary>
     std::uint8_t* stack;
+
+    struct {
+      zydis_reg_t vip;
+      zydis_reg_t vsp;
+    } m_vm;
   } m_jmp;
 
   /// <summary>
@@ -380,7 +388,7 @@ void init();
 /// <param name="vsp">vsp native register...</param>
 /// <param name="hndlr"></param>
 /// <returns>returns vinstr_t structure...</returns>
-vinstr_t determine(zydis_reg_t& vip, zydis_reg_t& vsp, hndlr_trace_t& hndlr);
+vinstr_t determine(hndlr_trace_t& hndlr);
 
 /// <summary>
 /// get profile from mnemonic...

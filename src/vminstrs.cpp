@@ -127,7 +127,7 @@ void init() {
               });
 }
 
-vinstr_t determine(zydis_reg_t& vip, zydis_reg_t& vsp, hndlr_trace_t& hndlr) {
+vinstr_t determine(hndlr_trace_t& hndlr) {
   const auto& instrs = hndlr.m_instrs;
   const auto profile = std::find_if(
       profiles.begin(), profiles.end(), [&](profiler_t* profile) -> bool {
@@ -136,7 +136,7 @@ vinstr_t determine(zydis_reg_t& vip, zydis_reg_t& vsp, hndlr_trace_t& hndlr) {
               std::find_if(instrs.begin(), instrs.end(),
                            [&](const emu_instr_t& instr) -> bool {
                              const auto& i = instr.m_instr;
-                             return matcher(vip, vsp, i);
+                             return matcher(hndlr.m_vip, hndlr.m_vsp, i);
                            });
           if (matched == instrs.end())
             return false;
@@ -147,7 +147,7 @@ vinstr_t determine(zydis_reg_t& vip, zydis_reg_t& vsp, hndlr_trace_t& hndlr) {
   if (profile == profiles.end())
     return vinstr_t{mnemonic_t::unknown};
 
-  auto result = (*profile)->generate(vip, vsp, hndlr);
+  auto result = (*profile)->generate(hndlr.m_vip, hndlr.m_vsp, hndlr);
   return result.has_value() ? result.value() : vinstr_t{mnemonic_t::unknown};
 }
 

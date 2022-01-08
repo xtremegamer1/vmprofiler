@@ -60,6 +60,7 @@ list(APPEND vmprofiler_SOURCES
 	"src/vmprofiles/lreg.cpp"
 	"src/vmprofiles/lvsp.cpp"
 	"src/vmprofiles/nand.cpp"
+	"src/vmprofiles/nop.cpp"
 	"src/vmprofiles/nor.cpp"
 	"src/vmprofiles/read.cpp"
 	"src/vmprofiles/shr.cpp"

@@ -20,6 +20,7 @@ enum class mnemonic_t {
   mul,
   imul,
   nand,
+  nop,
   nor,
   read,
   write,
@@ -143,6 +144,11 @@ struct vblk_t {
       zydis_reg_t vip;
       zydis_reg_t vsp;
     } m_vm;
+
+    /// <summary>
+    /// first instruction of the virtual jmp handler...
+    /// </summary>
+    std::uintptr_t rip;
   } m_jmp;
 
   /// <summary>
@@ -207,6 +213,11 @@ struct hndlr_trace_t {
   /// handler...
   /// </summary>
   std::uint8_t* m_stack;
+
+  /// <summary>
+  /// rip at the beginning of the trace...
+  /// </summary>
+  std::uintptr_t m_begin;
 
   /// <summary>
   /// native register used for virtual instruction pointer...
@@ -279,6 +290,7 @@ extern profiler_t add;
 extern profiler_t lvsp;
 extern profiler_t svsp;
 extern profiler_t nand;
+extern profiler_t nop;
 extern profiler_t nor;
 extern profiler_t read;
 extern profiler_t write;
@@ -290,8 +302,8 @@ extern profiler_t vmexit;
 /// unsorted vector of profiles... they get sorted once at runtime...
 /// </summary>
 inline std::vector<profiler_t*> profiles = {
-    &vmexit, &shr,  &imul, &nor, &write, &svsp, &read,
-    &nand,   &lvsp, &add,  &jmp, &sreg,  &lreg, &lconst};
+    &vmexit, &shr, &imul, &nor,  &write, &svsp,   &read, &nand,
+    &lvsp,   &add, &jmp,  &sreg, &lreg,  &lconst, &nop};
 
 /// <summary>
 /// no i did not make this by hand, you cannot clown upon me!

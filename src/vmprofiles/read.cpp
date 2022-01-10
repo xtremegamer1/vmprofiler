@@ -7,9 +7,8 @@ profiler_t read = {
     {{// MOV REG, [VSP]
       LOAD_VALUE,
       // MOV REG, [REG]
-      [&](const zydis_reg_t vip,
-          const zydis_reg_t vsp,
-          const zydis_decoded_instr_t& instr) -> bool {
+      [](const zydis_reg_t vip, const zydis_reg_t vsp,
+         const zydis_decoded_instr_t& instr) -> bool {
         return instr.mnemonic == ZYDIS_MNEMONIC_MOV &&
                instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                instr.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&
@@ -17,9 +16,8 @@ profiler_t read = {
       },
       // MOV [VSP], REG
       STR_VALUE}},
-    [&](zydis_reg_t& vip,
-        zydis_reg_t& vsp,
-        hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
+    [](zydis_reg_t& vip, zydis_reg_t& vsp,
+       hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
       vinstr_t res{mnemonic_t::read};
       res.imm.has_imm = false;
 

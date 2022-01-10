@@ -7,9 +7,8 @@ profiler_t jmp = {
     {{// MOV REG, [VSP]
       LOAD_VALUE,
       // ADD VSP, 8
-      [&](const zydis_reg_t vip,
-          const zydis_reg_t vsp,
-          const zydis_decoded_instr_t& instr) -> bool {
+      [](const zydis_reg_t vip, const zydis_reg_t vsp,
+         const zydis_decoded_instr_t& instr) -> bool {
         return instr.mnemonic == ZYDIS_MNEMONIC_ADD &&
                instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                instr.operands[0].reg.value == vsp &&
@@ -17,27 +16,24 @@ profiler_t jmp = {
                instr.operands[1].imm.value.u == 8;
       },
       // MOV REG, IMM_64
-      [&](const zydis_reg_t vip,
-          const zydis_reg_t vsp,
-          const zydis_decoded_instr_t& instr) -> bool {
+      [](const zydis_reg_t vip, const zydis_reg_t vsp,
+         const zydis_decoded_instr_t& instr) -> bool {
         return instr.mnemonic == ZYDIS_MNEMONIC_MOV &&
                instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                instr.operands[1].type == ZYDIS_OPERAND_TYPE_IMMEDIATE &&
                instr.operands[1].size == 64;
       },
       // LEA REG, [0x0] ; disp is -7...
-      [&](const zydis_reg_t vip,
-          const zydis_reg_t vsp,
-          const zydis_decoded_instr_t& instr) -> bool {
+      [](const zydis_reg_t vip, const zydis_reg_t vsp,
+         const zydis_decoded_instr_t& instr) -> bool {
         return instr.mnemonic == ZYDIS_MNEMONIC_LEA &&
                instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                instr.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&
                instr.operands[1].mem.disp.has_displacement &&
                instr.operands[1].mem.disp.value == -7;
       }}},
-    [&](zydis_reg_t& vip,
-        zydis_reg_t& vsp,
-        hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
+    [](zydis_reg_t& vip, zydis_reg_t& vsp,
+       hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
       const auto& instrs = hndlr.m_instrs;
       const auto xchg = std::find_if(
           instrs.begin(), instrs.end(), [&](const emu_instr_t& instr) -> bool {
@@ -76,8 +72,7 @@ profiler_t jmp = {
                      i.operands[1].reg.value == write_dep;
             });
 
-        if (mov_reg_write_dep == instrs.end())
-          return {};
+        if (mov_reg_write_dep == instrs.end()) return {};
 
         vsp = mov_reg_write_dep->m_instr.operands[0].reg.value;
       } else {
@@ -92,8 +87,7 @@ profiler_t jmp = {
                      i.operands[1].mem.base == vsp;
             });
 
-        if (mov_reg_deref_vsp == instrs.end())
-          return {};
+        if (mov_reg_deref_vsp == instrs.end()) return {};
 
         // find the MOV REG, mov_reg_deref_vsp->operands[0].reg.value
         const auto mov_vip_reg = std::find_if(
@@ -107,8 +101,7 @@ profiler_t jmp = {
                          mov_reg_deref_vsp->m_instr.operands[0].reg.value;
             });
 
-        if (mov_vip_reg == instrs.end())
-          return {};
+        if (mov_vip_reg == instrs.end()) return {};
 
         vip = mov_vip_reg->m_instr.operands[0].reg.value;
 
@@ -128,8 +121,8 @@ profiler_t jmp = {
       }
 
       vinstr_t res;
-      memset(&res, NULL, sizeof vinstr_t);
       res.mnemonic = mnemonic_t::jmp;
+      res.imm.has_imm = false;
       return res;
     }};
 }

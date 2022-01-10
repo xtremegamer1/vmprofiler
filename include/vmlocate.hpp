@@ -17,9 +17,7 @@ struct vm_enter_t {
   std::uint32_t encrypted_rva;
 };
 
-std::uintptr_t sigscan(void* base,
-                       std::uint32_t size,
-                       const char* pattern,
+std::uintptr_t sigscan(void* base, std::uint32_t size, const char* pattern,
                        const char* mask);
 
 std::vector<vm_enter_t> get_vm_entries(std::uintptr_t module_base,

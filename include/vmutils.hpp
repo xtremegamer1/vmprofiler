@@ -1,9 +1,12 @@
 #pragma once
 #include <Zydis/Zydis.h>
+
 #include <algorithm>
+#include <atomic>
 #include <cstdint>
 #include <fstream>
 #include <functional>
+#include <memory>
 #include <nt/image.hpp>
 #include <optional>
 #include <vector>
@@ -46,8 +49,7 @@ inline void init() {
 inline bool open_binary_file(const std::string& file,
                              std::vector<uint8_t>& data) {
   std::ifstream fstr(file, std::ios::binary);
-  if (!fstr.is_open())
-    return false;
+  if (!fstr.is_open()) return false;
 
   fstr.unsetf(std::ios::skipws);
   fstr.seekg(0, std::ios::end);
@@ -117,10 +119,8 @@ bool compare(zydis_reg_t a, zydis_reg_t b);
 /// from...</param> <param name="keep_jmps">keep JCC's in the flattened
 /// instruction stream...</param> <returns>returns true if flattened was
 /// successful...</returns>
-bool flatten(zydis_rtn_t& routine,
-             std::uintptr_t routine_addr,
-             bool keep_jmps = false,
-             std::uint32_t max_instrs = 500,
+bool flatten(zydis_rtn_t& routine, std::uintptr_t routine_addr,
+             bool keep_jmps = false, std::uint32_t max_instrs = 500,
              std::uintptr_t module_base = 0ull);
 
 /// <summary>

@@ -10,9 +10,8 @@ profiler_t lconst = {
       SUB_VSP,
       // MOV [VSP], REG
       STR_VALUE}},
-    [&](zydis_reg_t& vip,
-        zydis_reg_t& vsp,
-        hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
+    [](zydis_reg_t& vip, zydis_reg_t& vsp,
+       hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
       vinstr_t res;
       res.mnemonic = mnemonic_t::lconst;
       res.imm.has_imm = true;

@@ -7,9 +7,8 @@ profiler_t lreg = {
     {{// MOV REG, [VIP]
       IMM_FETCH,
       // MOV REG, [RSP+REG]
-      [&](const zydis_reg_t vip,
-          const zydis_reg_t vsp,
-          const zydis_decoded_instr_t& instr) -> bool {
+      [](const zydis_reg_t vip, const zydis_reg_t vsp,
+         const zydis_decoded_instr_t& instr) -> bool {
         return instr.mnemonic == ZYDIS_MNEMONIC_MOV &&
                instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                instr.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&
@@ -20,11 +19,9 @@ profiler_t lreg = {
       SUB_VSP,
       // MOV [VSP], REG
       STR_VALUE}},
-    [&](zydis_reg_t& vip,
-        zydis_reg_t& vsp,
-        hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
+    [](zydis_reg_t& vip, zydis_reg_t& vsp,
+       hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
       vinstr_t res;
-      memset(&res, NULL, sizeof res);
       res.mnemonic = mnemonic_t::lreg;
       res.imm.has_imm = true;
       res.imm.size = 8;

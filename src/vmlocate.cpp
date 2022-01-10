@@ -1,15 +1,13 @@
+#include <string>
 #include <vmlocate.hpp>
 
 namespace vm::locate {
-std::uintptr_t sigscan(void* base,
-                       std::uint32_t size,
-                       const char* pattern,
+std::uintptr_t sigscan(void* base, std::uint32_t size, const char* pattern,
                        const char* mask) {
   static const auto check_mask = [&](const char* base, const char* pattern,
                                      const char* mask) -> bool {
     for (; *mask; ++base, ++pattern, ++mask)
-      if (*mask == 'x' && *base != *pattern)
-        return false;
+      if (*mask == 'x' && *base != *pattern) return false;
     return true;
   };
 
@@ -39,8 +37,7 @@ std::vector<vm_enter_t> get_vm_entries(std::uintptr_t module_base,
           });
 
       // skip RSP push...
-      if (res == rtn.end() && reg != ZYDIS_REGISTER_RSP)
-        return false;
+      if (res == rtn.end() && reg != ZYDIS_REGISTER_RSP) return false;
     }
     return true;
   };
@@ -50,11 +47,9 @@ std::vector<vm_enter_t> get_vm_entries(std::uintptr_t module_base,
                      PUSH_4B_IMM, PUSH_4B_MASK);
 
     zydis_rtn_t rtn;
-    if (!vm::utils::scn::executable(module_base, result))
-      continue;
+    if (!vm::utils::scn::executable(module_base, result)) continue;
 
-    if (!vm::utils::flatten(rtn, result, false, 500, module_base))
-      continue;
+    if (!vm::utils::flatten(rtn, result, false, 500, module_base)) continue;
 
     // the last instruction in the stream should be a JMP to a register or a
     // return instruction...
@@ -93,8 +88,7 @@ std::vector<vm_enter_t> get_vm_entries(std::uintptr_t module_base,
     > 0x7a53 :                                    push rbx
     > 0x500d :                                    push r15
     */
-    if (num_pushs != 1)
-      continue;
+    if (num_pushs != 1) continue;
 
     // check for a pushfq...
     // > 0x4926 :                                    pushfq <---
@@ -123,8 +117,7 @@ std::vector<vm_enter_t> get_vm_entries(std::uintptr_t module_base,
     > 0x7a53 :                                    push rbx
     > 0x500d :                                    push r15
     */
-    if (!push_regs(rtn))
-      continue;
+    if (!push_regs(rtn)) continue;
 
     // check for a mov reg, rsp
     if (!vm::locate::find(rtn, [&](const zydis_instr_t& instr) -> bool {

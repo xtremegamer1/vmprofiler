@@ -1,5 +1,6 @@
 #pragma once
 #include <unicorn/unicorn.h>
+
 #include <vmutils.hpp>
 
 #define VIRTUAL_REGISTER_COUNT 24
@@ -239,18 +240,16 @@ struct hndlr_trace_t {
 /// matcher function which returns true if an instruction matches a desired
 /// one...
 /// </summary>
-using matcher_t = std::function<bool(const zydis_reg_t vip,
-                                     const zydis_reg_t vsp,
-                                     const zydis_decoded_instr_t& instr)>;
+using matcher_t =
+    std::function<bool(const zydis_reg_t vip, const zydis_reg_t vsp,
+                       const zydis_decoded_instr_t& instr)>;
 
 /// <summary>
 /// virtual instruction structure generator... this can update the vip and vsp
 /// argument... it cannot update the instruction stream (hndlr)...
 /// </summary>
-using vinstr_gen_t =
-    std::function<std::optional<vinstr_t>(zydis_reg_t& vip,
-                                          zydis_reg_t& vsp,
-                                          hndlr_trace_t& hndlr)>;
+using vinstr_gen_t = std::function<std::optional<vinstr_t>(
+    zydis_reg_t& vip, zydis_reg_t& vsp, hndlr_trace_t& hndlr)>;
 
 /// <summary>
 /// each virtual instruction has its own profiler_t structure which can generate
@@ -412,8 +411,8 @@ profiler_t* get_profile(mnemonic_t mnemonic);
 
 // MOV REG, [VIP]
 #define IMM_FETCH                                                   \
-  [&](const zydis_reg_t vip, const zydis_reg_t vsp,                 \
-      const zydis_decoded_instr_t& instr) -> bool {                 \
+  [](const zydis_reg_t vip, const zydis_reg_t vsp,                  \
+     const zydis_decoded_instr_t& instr) -> bool {                  \
     return vm::utils::is_mov(instr) &&                              \
            instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER && \
            instr.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&   \
@@ -422,8 +421,8 @@ profiler_t* get_profile(mnemonic_t mnemonic);
 
 // MOV [VSP], REG
 #define STR_VALUE                                                 \
-  [&](const zydis_reg_t vip, const zydis_reg_t vsp,               \
-      const zydis_decoded_instr_t& instr) -> bool {               \
+  [](const zydis_reg_t vip, const zydis_reg_t vsp,                \
+     const zydis_decoded_instr_t& instr) -> bool {                \
     return instr.mnemonic == ZYDIS_MNEMONIC_MOV &&                \
            instr.operands[0].type == ZYDIS_OPERAND_TYPE_MEMORY && \
            instr.operands[0].mem.base == vsp &&                   \
@@ -432,8 +431,8 @@ profiler_t* get_profile(mnemonic_t mnemonic);
 
 // MOV REG, [VSP]
 #define LOAD_VALUE                                                  \
-  [&](const zydis_reg_t vip, const zydis_reg_t vsp,                 \
-      const zydis_decoded_instr_t& instr) -> bool {                 \
+  [](const zydis_reg_t vip, const zydis_reg_t vsp,                  \
+     const zydis_decoded_instr_t& instr) -> bool {                  \
     return instr.mnemonic == ZYDIS_MNEMONIC_MOV &&                  \
            instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER && \
            instr.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&   \
@@ -442,8 +441,8 @@ profiler_t* get_profile(mnemonic_t mnemonic);
 
 // SUB VSP, OFFSET
 #define SUB_VSP                                                     \
-  [&](const zydis_reg_t vip, const zydis_reg_t vsp,                 \
-      const zydis_decoded_instr_t& instr) -> bool {                 \
+  [](const zydis_reg_t vip, const zydis_reg_t vsp,                  \
+     const zydis_decoded_instr_t& instr) -> bool {                  \
     return instr.mnemonic == ZYDIS_MNEMONIC_SUB &&                  \
            instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER && \
            instr.operands[0].reg.value == vsp &&                    \

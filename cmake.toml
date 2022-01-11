@@ -1,6 +1,10 @@
 [project]
 name = "vmprofiler"
 
+cmake-before = """
+    set(UNICORN_ARCH x86)
+"""
+
 [target.vmprofiler]
 type = "static"
 compile-features = ["cxx_std_20"]

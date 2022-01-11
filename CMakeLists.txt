@@ -23,6 +23,8 @@ if(CMKR_ROOT_PROJECT)
 	configure_file(cmake.toml cmake.toml COPYONLY)
 endif()
 
+    set(UNICORN_ARCH x86)
+
 project(vmprofiler)
 
 # deps

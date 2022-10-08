@@ -10,7 +10,7 @@ namespace vm::instrs {
 /// <summary>
 /// mnemonic representation of supported virtual instructions...
 /// </summary>
-enum class mnemonic_t {
+enum class mnemonic_t : uint8_t {
   unknown,
   sreg,
   lreg,
@@ -117,7 +117,7 @@ struct vblk_t {
     /// <summary>
     /// image based relative virtual address...
     /// </summary>
-    std::uintptr_t img_base;
+    std::uintptr_t img_based;
   } m_vip;
 
   /// <summary>

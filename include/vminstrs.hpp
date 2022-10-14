@@ -40,7 +40,8 @@ enum class mnemonic_t : uint8_t {
   rdtsc,
   call,
   jmp,
-  vmexit
+  vmexit,
+  writedr7
 };
 
 /// <summary>
@@ -295,6 +296,7 @@ extern profiler_t nor;
 extern profiler_t read;
 extern profiler_t readbzxw;
 extern profiler_t write;
+extern profiler_t writedr7;
 extern profiler_t imul;
 extern profiler_t shl;
 extern profiler_t shld;
@@ -307,8 +309,8 @@ extern profiler_t vmexit;
 /// unsorted vector of profiles... they get sorted once at runtime...
 /// </summary>
 inline std::vector<profiler_t*> profiles = {
-    &vmexit, &shl, &shld, &shr, &shrd, &imul, &nor,  &write, &svsp,   &read, &readbzxw, 
-    &nand, &lvsp,   &add, &jmp,  &sreg, &lreg,  &lconst, &nop};
+    &vmexit, &shl, &shld, &shr, &shrd, &imul, &nor,  &write, &svsp, &read, &readbzxw, 
+    &nand, &lvsp, &add, &jmp,  &sreg, &lreg,  &lconst, &nop, &writedr7};
 
 /// <summary>
 /// no i did not make this by hand, you cannot clown upon me!

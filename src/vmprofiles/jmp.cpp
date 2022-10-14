@@ -102,11 +102,27 @@ profiler_t jmp = {
                      i.operands[1].reg.value ==
                          mov_reg_deref_vsp->m_instr.operands[0].reg.value;
             });
+        //It is possible that mov_vip_reg is actually updating the rolling key, if so use original vip
+        const auto load_handler_rva = std::find_if(
+          mov_vip_reg, instrs.end(),
+          [&](const emu_instr_t& instr) -> bool {
+            const auto& i = instr.m_instr;
+            return i.mnemonic == ZYDIS_MNEMONIC_MOV &&
+                    i.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
+                    vm::utils::is_32_bit_gp(i.operands[0].reg.value) &&
+                    i.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&
+                    i.operands[1].mem.base ==
+                        mov_vip_reg->m_instr.operands[0].reg.value;
+          });
 
         if (mov_vip_reg == instrs.end()) 
           return {};
 
-        vip = mov_vip_reg->m_instr.operands[0].reg.value;
+        vip = (load_handler_rva != instrs.end()) ? 
+          mov_vip_reg->m_instr.operands[0].reg.value : 
+          mov_vip_reg->m_instr.operands[1].reg.value; 
+        //Ok so basically mov_vip_reg, despite its name, isn't guaranteed to be
+        //mov vip, reg, and can in fact be mov rkey, vip. 
 
         // see if VSP gets updated as well...
         const auto mov_reg_vsp = std::find_if(

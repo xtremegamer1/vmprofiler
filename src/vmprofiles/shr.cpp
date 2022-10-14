@@ -2,7 +2,7 @@
 
 namespace vm::instrs {
 profiler_t shr = {
-    "SHR",
+    "SHRD",
     mnemonic_t::shr,
     {{// MOV REG, [VSP]
       LOAD_VALUE,

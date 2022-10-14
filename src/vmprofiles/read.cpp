@@ -26,13 +26,13 @@ profiler_t read = {
           hndlr.m_instrs.begin(), hndlr.m_instrs.end(),
           [&](emu_instr_t& instr) -> bool {
             const auto& i = instr.m_instr;
-            return i.mnemonic == ZYDIS_MNEMONIC_MOV &&
+            return i.mnemonic == ZYDIS_MNEMONIC_MOV || i.mnemonic == ZYDIS_MNEMONIC_MOVZX &&
                    i.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                    i.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&
                    i.operands[1].mem.base != vsp;
           });
 
-      res.stack_size = mov_reg_reg->m_instr.operands[0].size;
+      res.stack_size = mov_reg_reg->m_instr.operands[1].size;
       return res;
     }};
 }

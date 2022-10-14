@@ -45,10 +45,10 @@ profiler_t shl = {
       }}},
     [](zydis_reg_t& vip, zydis_reg_t& vsp,
        hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
-      vinstr_t res{mnemonic_t::shr};
+      vinstr_t res{mnemonic_t::shl};
       res.imm.has_imm = false;
 
-      const auto shr_reg = std::find_if(
+      const auto shl_reg = std::find_if(
           hndlr.m_instrs.begin(), hndlr.m_instrs.end(),
           [&](emu_instr_t& instr) -> bool {
             const auto& i = instr.m_instr;
@@ -57,7 +57,7 @@ profiler_t shl = {
                    i.operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER;
           });
 
-      res.stack_size = shr_reg->m_instr.operands[0].size;
+      res.stack_size = shl_reg->m_instr.operands[0].size;
       return res;
     }};
 }

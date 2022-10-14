@@ -5,3 +5,4 @@
 #include <vminstrs.hpp>
 #include <vmlocate.hpp>
 #include <vmutils.hpp>
+#include <uc_allocation_tracker.hpp>

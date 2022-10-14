@@ -1,5 +1,5 @@
 #include <vminstrs.hpp>
-
+#include <uc_allocation_tracker.hpp>
 namespace vm::instrs {
 void deobfuscate(hndlr_trace_t& trace) {
   static const auto _uses_reg = [](zydis_decoded_operand_t& op,
@@ -64,11 +64,13 @@ void deobfuscate(hndlr_trace_t& trace) {
 
       if (std::find(blacklist.begin(), blacklist.end(),
                     itr->m_instr.mnemonic) != blacklist.end()) {
+        uct_context_free(itr->m_cpu);
         trace.m_instrs.erase(itr);
         break;
       }
 
       if (vm::utils::is_jmp(itr->m_instr)) {
+        uct_context_free(itr->m_cpu);
         trace.m_instrs.erase(itr);
         break;
       }
@@ -111,6 +113,7 @@ void deobfuscate(hndlr_trace_t& trace) {
               _writes(read_result->m_instr, reg))
             continue;
 
+          uct_context_free(itr->m_cpu);
           trace.m_instrs.erase(itr);
           break;
         }

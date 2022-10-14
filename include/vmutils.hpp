@@ -70,6 +70,8 @@ inline bool open_binary_file(const std::string& file,
 /// <returns></returns>
 bool is_jmp(const zydis_decoded_instr_t& instr);
 
+bool is_32_bit_gp(const ZydisRegister reg);
+
 /// <summary>
 /// used by profiles to see if an instruction is a MOV/SX/ZX...
 /// </summary>

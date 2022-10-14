@@ -28,6 +28,11 @@ bool is_mov(const zydis_decoded_instr_t& instr) {
          instr.mnemonic == ZYDIS_MNEMONIC_MOVZX;
 }
 
+bool is_32_bit_gp(const ZydisRegister reg)
+{
+  return reg >= ZYDIS_REGISTER_EAX && reg <= ZYDIS_REGISTER_R15D;
+}
+
 bool flatten(zydis_rtn_t& routine,
              std::uintptr_t routine_addr,
              bool keep_jmps,

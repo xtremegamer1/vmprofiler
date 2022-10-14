@@ -1,5 +1,6 @@
 #include <vminstrs.hpp>
 
+//Write value on top of stack to dr7
 namespace vm::instrs {
 profiler_t writedr7 = {
   "WRITEDR7",
@@ -27,7 +28,8 @@ profiler_t writedr7 = {
   },
   [](zydis_reg_t& vip, zydis_reg_t& vsp,
       hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
-      vinstr_t res{mnemonic_t::write};
+      vinstr_t res{mnemonic_t::writedr7};
+      res.stack_size == 64;
       res.imm.has_imm = false;
       return res;
   }

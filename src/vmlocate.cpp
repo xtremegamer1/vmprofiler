@@ -49,6 +49,18 @@ std::vector<vm_enter_t> get_vm_entries(std::uintptr_t module_base,
     zydis_rtn_t rtn;
     if (!vm::utils::scn::executable(module_base, result)) continue;
 
+    // Make sure that the form of the vmenter is a jmp immediately followed by a call imm
+    ZydisDecodedInstruction after_push;
+    if (ZYAN_SUCCESS(ZydisDecoderDecodeBuffer(vm::utils::g_decoder.get(), 
+                          (void*)(result + 5), 5, &after_push)))
+    {
+      if (after_push.mnemonic != ZYDIS_MNEMONIC_CALL ||
+        after_push.operands[0].type != ZYDIS_OPERAND_TYPE_IMMEDIATE)
+        continue;
+    }
+    else
+      continue;
+
     if (!vm::utils::flatten(rtn, result, false, 500, module_base)) continue;
 
     // the last instruction in the stream should be a JMP to a register or a

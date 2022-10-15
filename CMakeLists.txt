@@ -75,6 +75,7 @@ list(APPEND vmprofiler_SOURCES
 	"src/vmprofiles/write.cpp"
 	"src/vmprofiles/lcr0.cpp"
 	"src/vmprofiles/and.cpp"
+	"src/vmprofiles/or.cpp"
 	"src/vmprofiles/writedr7.cpp"
 	"src/vmutils.cpp"
 	"include/uc_allocation_tracker.hpp"

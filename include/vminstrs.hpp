@@ -16,6 +16,7 @@ enum class mnemonic_t : uint8_t {
   lreg,
   lconst,
   add,
+  _or,
   _and, //The fucking idiots who wrote the standard thought reserving the word "and" was appropriate
   div,
   idiv,
@@ -289,6 +290,7 @@ extern profiler_t sreg;
 extern profiler_t lreg;
 extern profiler_t lconst;
 extern profiler_t add;
+extern profiler_t _or;
 extern profiler_t _and;
 extern profiler_t lvsp;
 extern profiler_t svsp;
@@ -312,7 +314,7 @@ extern profiler_t vmexit;
 /// </summary>
 inline std::vector<profiler_t*> profiles = {
     &vmexit, &shl, &shld, &shr, &shrd, &imul, &nor,  &write, &svsp, &read, 
-    &nand, &lvsp, &add, &jmp, &_and, &sreg, &lreg, &lcr0,  &lconst, &nop, &writedr7};
+    &nand, &lvsp, &add, &jmp, &_or, &_and, &sreg, &lreg, &lcr0,  &lconst, &nop, &writedr7};
 
 /// <summary> 
 /// no i did not make this by hand, you cannot clown upon me!

@@ -54,7 +54,6 @@ profiler_t _or = {
           });
       if (reg_vsp_offset == hndlr.m_instrs.end())
         return std::nullopt;
-
       res.stack_size = reg_vsp_offset->m_instr.operands[0].size;
       return res;
     }};

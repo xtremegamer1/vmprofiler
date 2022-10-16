@@ -8,7 +8,8 @@ vmctx_t::vmctx_t(std::uintptr_t module_base,
     : m_module_base(module_base),
       m_image_base(image_base),
       m_vm_entry_rva(vm_entry_rva),
-      m_image_size(image_size) {}
+      m_image_size(image_size),
+      m_image_load_delta(m_module_base - m_image_base) {}
 
 bool vmctx_t::init() {
   vm::utils::init();
@@ -20,6 +21,40 @@ bool vmctx_t::init() {
 
   vm::utils::deobfuscate(m_vm_entry);
 
+  //Get the order in which native registers are pushed
+  int push_index = 0;
+  for (const auto& instr : m_vm_entry)
+  {
+    if (instr.instr.mnemonic == ZYDIS_MNEMONIC_PUSH &&
+        instr.instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
+        vm::utils::is_64_bit_gp(instr.instr.operands[0].reg.value))
+    {
+      if (std::find(vmentry_push_order.begin(), vmentry_push_order.begin() + push_index,
+          instr.instr.operands[0].reg.value) != vmentry_push_order.begin() + push_index)
+      {
+        //Every register should only be pushed once
+        std::printf("Error initializing vmctx_t: vmenter pushes could not be parsed.\n");
+        vm::utils::print(m_vm_entry);
+        return false;
+      }
+      vmentry_push_order[push_index++] = instr.instr.operands[0].reg.value;
+    }
+    else if (instr.instr.mnemonic == ZYDIS_MNEMONIC_PUSHFQ)
+    {
+      if (std::find(vmentry_push_order.begin(), vmentry_push_order.begin() + push_index,
+          instr.instr.operands[0].reg.value) != vmentry_push_order.begin() + push_index)
+      {
+        // Same shit
+        std::printf("Error initializing vmctx_t: vmenter pushes could not be parsed.\n");
+        vm::utils::print(m_vm_entry);
+        return false;
+      }
+      vmentry_push_order[push_index++] = ZYDIS_REGISTER_RFLAGS;
+    }
+    if (push_index == 16)
+      break;
+  }
+  
   // find mov reg, [rsp+0x90]. this register will be VIP...
   const auto vip_fetch = std::find_if(
       m_vm_entry.begin(), m_vm_entry.end(),
@@ -52,5 +87,9 @@ bool vmctx_t::init() {
 
   m_vsp = vsp_fetch->instr.operands[0].reg.value;
   return true;
+}
+const std::array<ZydisRegister, 16>& vm::vmctx_t::get_vmentry_push_order() const
+{
+  return vmentry_push_order;
 }
 }  // namespace vm

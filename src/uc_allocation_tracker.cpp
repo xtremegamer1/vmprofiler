@@ -11,7 +11,7 @@ uc_err uct_context_alloc(uc_engine *uc, uc_context **context)
 }
 uc_err uct_context_free(uc_context *context)
 {
-  +g_allocation_tracker--;
+  --g_allocation_tracker;
   //std::printf("Allocations: %p\n", g_allocation_tracker);
   return uc_context_free(context);
 }

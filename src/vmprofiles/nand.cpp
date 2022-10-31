@@ -21,10 +21,10 @@ profiler_t nand = {
         return instr.mnemonic == ZYDIS_MNEMONIC_NOT &&
                instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER;
       },
-      // AND REG, REG
+      // OR REG, REG
       [](const zydis_reg_t vip, const zydis_reg_t vsp,
          const zydis_decoded_instr_t& instr) -> bool {
-        return instr.mnemonic == ZYDIS_MNEMONIC_AND &&
+        return instr.mnemonic == ZYDIS_MNEMONIC_OR &&
                instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                instr.operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER;
       },

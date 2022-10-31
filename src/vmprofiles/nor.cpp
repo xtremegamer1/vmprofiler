@@ -21,10 +21,10 @@ profiler_t nor = {
         return instr.mnemonic == ZYDIS_MNEMONIC_NOT &&
                instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER;
       },
-      // OR REG, REG
+      // AND REG, REG
       [](const zydis_reg_t vip, const zydis_reg_t vsp,
          const zydis_decoded_instr_t& instr) -> bool {
-        return instr.mnemonic == ZYDIS_MNEMONIC_OR &&
+        return instr.mnemonic == ZYDIS_MNEMONIC_AND &&
                instr.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                instr.operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER;
       },
@@ -51,7 +51,7 @@ profiler_t nor = {
       }}},
     [](zydis_reg_t& vip, zydis_reg_t& vsp,
        hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
-      vinstr_t res{mnemonic_t::nand};
+      vinstr_t res{mnemonic_t::nor};
       res.imm.has_imm = false;
 
       // MOV [VSP+OFFSET], REG

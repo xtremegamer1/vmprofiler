@@ -24,7 +24,7 @@ profiler_t shrd = {
                instr.operands[1].mem.base == vsp &&
                instr.operands[1].mem.disp.has_displacement;
       },
-      // SHR REG, REG
+      // SHRD REG, REG
       [](const zydis_reg_t vip, const zydis_reg_t vsp,
          const zydis_decoded_instr_t& instr) -> bool {
         return instr.mnemonic == ZYDIS_MNEMONIC_SHRD &&

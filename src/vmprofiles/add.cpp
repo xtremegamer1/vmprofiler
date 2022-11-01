@@ -46,6 +46,7 @@ profiler_t add = {
     [](zydis_reg_t& vip, zydis_reg_t& vsp,
        hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
       vinstr_t res{mnemonic_t::add};
+      res.imm.has_imm = false;
 
       // MOV REG, [VSP]
       const auto mov_reg_vsp = std::find_if(
@@ -71,7 +72,6 @@ profiler_t add = {
           });
 
       res.stack_size = mov_vsp_offset->m_instr.operands[1].size;
-      res.imm.size = mov_reg_vsp->m_instr.operands[1].size;
       return res;
     }};
 }

@@ -1,3 +1,4 @@
+#pragma once
 #include <unicorn\unicorn.h>
 
 extern int g_allocation_tracker;

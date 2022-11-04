@@ -142,6 +142,7 @@ profiler_t jmp = {
       vinstr_t res;
       res.mnemonic = mnemonic_t::jmp;
       res.imm.has_imm = false;
+      res.stack_size = 64;
       return res;
     }};
 }

@@ -109,6 +109,8 @@ enum class vbranch_type {
 /// virtual code block
 /// </summary>
 struct vblk_t {
+  bool is_branch;
+
   /// <summary>
   /// start address VIP of this basic block...
   /// </summary>

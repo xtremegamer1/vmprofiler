@@ -69,7 +69,7 @@ void deobfuscate(hndlr_trace_t& trace) {
         break;
       }
 
-      if (vm::utils::is_jmp(itr->m_instr)) {
+      if (vm::utils::is_jmp(itr->m_instr) && itr->m_instr.operands[0].type != ZYDIS_OPERAND_TYPE_REGISTER) {
         uct_context_free(itr->m_cpu);
         trace.m_instrs.erase(itr);
         break;

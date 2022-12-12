@@ -131,8 +131,42 @@ void init() {
 }
 
 vinstr_t determine(hndlr_trace_t& hndlr) {
-  const auto& instrs = hndlr.m_instrs;
-  const auto profile = std::find_if(
+  std::vector<emu_instr_t> trimmed_instrs = hndlr.m_instrs;
+  // find the last MOV REG, DWORD PTR [VIP] in the instruction stream, then
+  // remove any instructions from this instruction to the JMP/RET...
+  const auto rva_fetch = std::find_if(
+  trimmed_instrs.rbegin(), trimmed_instrs.rend(),
+  [& vip = hndlr.m_vip](
+      const vm::instrs::emu_instr_t& instr) -> bool {
+    const auto& i = instr.m_instr;
+    return i.mnemonic == ZYDIS_MNEMONIC_MOV &&
+           i.operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
+           i.operands[1].type == ZYDIS_OPERAND_TYPE_MEMORY &&
+           i.operands[1].mem.base == vip && i.operands[1].size == 32;
+  });
+
+  if (rva_fetch != trimmed_instrs.rend())
+      trimmed_instrs.erase((rva_fetch + 1).base(), trimmed_instrs.end());
+  auto profile = std::find_if(
+    profiles.begin(), profiles.end(), [&](profiler_t* profile) -> bool {
+      for (auto& matcher : profile->matchers) {
+        const auto matched =
+            std::find_if(trimmed_instrs.begin(), trimmed_instrs.end(),
+                         [&](const emu_instr_t& instr) -> bool {
+                           const auto& i = instr.m_instr;
+                           return matcher(hndlr.m_vip, hndlr.m_vsp, i);
+                         });
+        if (matched == trimmed_instrs.end())
+          return false;
+      }
+      return true;
+    });
+
+  if (profile == profiles.end())
+  {
+    const auto& instrs = hndlr.m_instrs;
+    // Try again with original instruction stream including those after the last MOV REG, DWORD PTR [VIP] just to be sure
+    profile = std::find_if(
       profiles.begin(), profiles.end(), [&](profiler_t* profile) -> bool {
         for (auto& matcher : profile->matchers) {
           const auto matched =
@@ -144,8 +178,9 @@ vinstr_t determine(hndlr_trace_t& hndlr) {
           if (matched == instrs.end())
             return false;
         }
-        return true;
-      });
+      return true;
+    });
+  }
 
   if (profile == profiles.end())
     return vinstr_t{mnemonic_t::unknown};

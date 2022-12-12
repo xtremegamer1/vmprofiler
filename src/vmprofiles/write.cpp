@@ -29,6 +29,8 @@ profiler_t write = {
         return instr.mnemonic == ZYDIS_MNEMONIC_MOV &&
                instr.operands[0].type == ZYDIS_OPERAND_TYPE_MEMORY &&
                instr.operands[0].mem.base != vsp &&
+               instr.operands[0].mem.base != ZYDIS_REGISTER_RSP &&
+              //!instr.operands[0].mem.disp.has_displacement &&
                instr.operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER &&
                instr.operands[1].reg.value != vsp;
       }}},

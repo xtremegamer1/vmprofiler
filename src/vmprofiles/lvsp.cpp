@@ -15,7 +15,7 @@ profiler_t lvsp = {
       }}},
     [](zydis_reg_t& vip, zydis_reg_t& vsp,
        hndlr_trace_t& hndlr) -> std::optional<vinstr_t> {
-      vinstr_t res{mnemonic_t::svsp};
+      vinstr_t res{mnemonic_t::lvsp};
       res.imm.has_imm = false;
 
       const auto load_vsp = std::find_if(

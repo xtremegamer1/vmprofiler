@@ -2,6 +2,7 @@
 #include <unicorn/unicorn.h>
 
 #include <vmutils.hpp>
+#include <array>
 
 #define VIRTUAL_REGISTER_COUNT 24
 #define VIRTUAL_SEH_REGISTER 24
@@ -157,6 +158,8 @@ struct vblk_t {
     /// </summary>
     std::uintptr_t rip;
   } m_jmp;
+
+  std::array<ZydisRegister, 16> vmexit_pop_order;
 
   /// <summary>
   /// vector of virtual instructions for this basic block...
